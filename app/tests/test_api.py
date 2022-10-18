@@ -28,6 +28,11 @@ Base.metadata.create_all(bind=engine)
 
 
 def override_get_db():
+	"""
+		creates a mock database
+
+		:return: mock sqlite database
+	"""
 	try:
 		db = TestingSessionLocal()
 		yield db
@@ -87,9 +92,10 @@ def valid_access_token(create_test_user, request) -> str:
 	def delete_user():
 		try:
 			db = TestingSessionLocal()
-		finally:
 			db.execute("delete from users")
 			db.commit()
+		finally:
+			print("database cleaned")
 
 	request.addfinalizer(delete_user)
 
@@ -133,6 +139,3 @@ def test_login_wrong_password():
 	assert response.json() == {
 		'detail': 'Incorrect Email or Password',
 	}
-
-
-
