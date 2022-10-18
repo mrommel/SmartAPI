@@ -18,7 +18,7 @@ tests: venv
 	./$(VENV)/bin/python3 -m unittest
 
 run: venv
-	./$(VENV)/bin/python3 uvicorn app.main:app --host localhost --port 8000 --reload
+	uvicorn app.main:app --host localhost --port 8000 --reload
 
 start-db: venv
 	docker-compose up -d
