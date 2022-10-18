@@ -69,7 +69,7 @@ def require_user(db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
 
 	except Exception as e:
 		error = e.__class__.__name__
-		print(error)
+
 		if error == 'MissingTokenError':
 			raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='You are not logged in') from e
 

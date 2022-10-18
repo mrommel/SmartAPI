@@ -94,8 +94,8 @@ def valid_access_token(create_test_user, request) -> str:
 			db = TestingSessionLocal()
 			db.execute("delete from users")
 			db.commit()
-		finally:
-			print("database cleaned")
+		except Exception as e:
+			print(f"exception: {e}")
 
 	request.addfinalizer(delete_user)
 
@@ -139,3 +139,50 @@ def test_login_wrong_password():
 	assert response.json() == {
 		'detail': 'Incorrect Email or Password',
 	}
+
+
+def test_user_profile_success(valid_access_token):
+	"""
+		get current users profile data
+
+		:param valid_access_token: fixture that adds a jwt cookie
+		:return: Nothing
+	"""
+
+	response = client.get(
+		"/api/users/me",
+		headers={
+			'accept': 'application/json',
+			'Content-Type': 'application/json',
+		},
+	)
+
+	assert response.status_code == 200
+	assert response.json()["name"] == 'string'
+	assert response.json()["email"] == 'sample@abc.de'
+	assert response.json()["photo"] == 'abc.jpg'
+	assert response.json()["id"] is not None
+	assert response.json()["created_at"] is not None
+	assert response.json()["updated_at"] is not None
+
+
+def test_user_profile_invalid_token():
+	"""
+		get error for current users profile data because of invalid token
+
+		:return: Nothing
+	"""
+
+	response = client.get(
+		"/api/users/me",
+		headers={
+			'accept': 'application/json',
+			'Content-Type': 'application/json',
+		},
+		cookies={
+			'access_token': 'abc'
+		}
+	)
+
+	assert response.status_code == 401
+	assert response.json() == { 'detail': 'Token is invalid or has expired' }
