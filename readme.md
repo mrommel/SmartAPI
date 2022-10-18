@@ -1,4 +1,8 @@
-# python fastapi
+# SmartAPI
+
+![](https://github.com/mrommel/SmartAPI/workflows/Pylint/badge.svg)
+![](https://github.com/mrommel/SmartAPI/workflows/Pytest/badge.svg)
+
 
 ## start postgres docker
 

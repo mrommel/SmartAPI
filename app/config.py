@@ -1,7 +1,11 @@
+"""configuration module"""
 from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
+	"""
+		settings class
+	"""
 	DATABASE_PORT: int
 	POSTGRES_PASSWORD: str
 	POSTGRES_USER: str
@@ -18,6 +22,9 @@ class Settings(BaseSettings):
 	CLIENT_ORIGIN: str
 
 	class Config:
+		"""
+			locale configuration
+		"""
 		env_file = './.env'
 
 
