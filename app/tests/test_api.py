@@ -2,7 +2,10 @@
 import pytest
 from fastapi.testclient import TestClient
 import sqlalchemy.ext.asyncio
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
+from app.database import Base, get_db
 from app.main import app
 
 # Redefining name - for fixtures
@@ -14,11 +17,33 @@ from app.main import app
 
 client = TestClient(app)
 
+# debug
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
-@pytest_asyncio.fixture(autouse=True)
-async def migrate():
-    await migrate_db(conn_url)
-    yield
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+Base.metadata.create_all(bind=engine)
+
+
+def override_get_db():
+    try:
+        db = TestingSessionLocal()
+        yield db
+    finally:
+        db.close()
+
+
+app.dependency_overrides[get_db] = override_get_db
+#debug
+
+#@pytest_asyncio.fixture(autouse=True)
+#async def migrate():
+#    await migrate_db(conn_url)
+#    yield
 
 @pytest.fixture
 def create_test_user():

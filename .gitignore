@@ -3,3 +3,4 @@ venv/
 .env
 .idea
 db.sqlite
+test.db

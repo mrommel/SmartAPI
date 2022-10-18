@@ -17,23 +17,23 @@ cfg = Config(__config_path__)
 cfg.set_main_option("script_location", __migration_path__)
 
 
-async def migrate_db(conn_url: str):
-	async_engine = create_async_engine(conn_url, echo=True)
-	async with async_engine.begin() as conn:
-		await conn.run_sync(__execute_upgrade)
+#async def migrate_db(conn_url: str):
+#	async_engine = create_async_engine(conn_url, echo=True)
+#	async with async_engine.begin() as conn:
+#		await conn.run_sync(__execute_upgrade)
 
 
-def __execute_upgrade(connection):
-	cfg.attributes["connection"] = connection
-	command.upgrade(cfg, "head")
+#def __execute_upgrade(connection):
+#	cfg.attributes["connection"] = connection
+#	command.upgrade(cfg, "head")
 
 
 SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@" \
                           f"{settings.POSTGRES_HOSTNAME}:{settings.DATABASE_PORT}/{settings.POSTGRES_DB} "
 
-if 'unittest' in sys.modules.keys():
-	SQLALCHEMY_DATABASE_URL = "sqlite:///../db.sqlite"
-	await migrate_db(SQLALCHEMY_DATABASE_URL)
+#if 'unittest' in sys.modules.keys():
+#	SQLALCHEMY_DATABASE_URL = "sqlite:///../db.sqlite"
+#	await migrate_db(SQLALCHEMY_DATABASE_URL)
 
 engine = create_engine(
 	SQLALCHEMY_DATABASE_URL
