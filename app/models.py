@@ -14,6 +14,8 @@ class GUID(TypeDecorator):
 	"""
 	impl = CHAR
 
+	cache_ok = True
+
 	def load_dialect_impl(self, dialect):
 		if dialect.name == 'postgresql':
 			return dialect.type_descriptor(UUID())
@@ -55,5 +57,3 @@ class User(Base):
 	role = Column(String, server_default='user', nullable=False)
 	created_at = Column(DateTime, default=func.current_timestamp())
 	updated_at = Column(DateTime, default=func.current_timestamp(), onupdate=func.current_timestamp())
-# created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
-# updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))

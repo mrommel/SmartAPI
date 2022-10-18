@@ -15,7 +15,8 @@ pylint: venv
 	./$(VENV)/bin/pylint --disable=C0303,R0903,R0915,C0103,E1101,E0102,R0913,W0123,R0912,R0801 --extension-pkg-whitelist='pydantic' app
 
 tests: venv
-	./$(VENV)/bin/python3 -m unittest
+	#./$(VENV)/bin/python3 -m unittest
+	pytest -ra
 
 run: venv
 	uvicorn app.main:app --host localhost --port 8000 --reload

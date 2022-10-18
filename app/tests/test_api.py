@@ -1,7 +1,6 @@
 """test module"""
 import pytest
 from fastapi.testclient import TestClient
-import sqlalchemy.ext.asyncio
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -21,29 +20,23 @@ client = TestClient(app)
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+	SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 
 Base.metadata.create_all(bind=engine)
 
 
 def override_get_db():
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
+	try:
+		db = TestingSessionLocal()
+		yield db
+	finally:
+		db.close()
 
 
 app.dependency_overrides[get_db] = override_get_db
-#debug
 
-#@pytest_asyncio.fixture(autouse=True)
-#async def migrate():
-#    await migrate_db(conn_url)
-#    yield
 
 @pytest.fixture
 def create_test_user():
@@ -63,25 +56,42 @@ def create_test_user():
 			"verified": "true"
 		},
 	)
-	print(signup_response.json())
-	assert signup_response.status_code == 200
-	assert signup_response.json()["access_token"] is not None
+
+	assert signup_response.status_code == 201
+	assert signup_response.json()["name"] == 'string'
+	assert signup_response.json()["email"] == 'sample@abc.de'
+	assert signup_response.json()["photo"] == 'abc.jpg'
+	assert signup_response.json()["id"] is not None
+	assert signup_response.json()["created_at"] is not None
+	assert signup_response.json()["updated_at"] is not None
+
+	return {}
 
 
 @pytest.fixture
-def valid_access_token(create_test_user) -> str:
+def valid_access_token(create_test_user, request) -> str:
 	"""
 		get a valid access_token
 
+		:param request:
 		:param create_test_user: fixture to create a test user
 		:return: access_token
 	"""
 	login_response = client.post(
 		"/api/auth/login",
-		json={"email": "sample@abc.de", "password": "secret"},
+		json={"email": "sample@abc.de", "password": "secret123"},
 	)
 	assert login_response.status_code == 200
 	assert login_response.json()["access_token"] is not None
+
+	def delete_user():
+		try:
+			db = TestingSessionLocal()
+		finally:
+			db.execute("delete from users")
+			db.commit()
+
+	request.addfinalizer(delete_user)
 
 	return login_response.json()["access_token"]
 
@@ -118,7 +128,11 @@ def test_login_wrong_password():
 		"/api/auth/login",
 		json={"email": "abdulazeez@x.com", "password": "weakpassword"},
 	)
-	assert response.status_code == 200
+
+	assert response.status_code == 400
 	assert response.json() == {
-		'error': 'Wrong login details!',
+		'detail': 'Incorrect Email or Password',
 	}
+
+
+
