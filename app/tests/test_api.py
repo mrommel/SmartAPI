@@ -1,11 +1,12 @@
 """test module"""
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import ObjectDeletedError
 
 from app.database import Base, get_db
 from app.main import app
+from app.tests.test_utils import CookieConfigurableTestClient
 
 # Redefining name - for fixtures
 # pylint: disable=W0621
@@ -14,7 +15,7 @@ from app.main import app
 # pylint: disable=W0613
 
 
-client = TestClient(app)
+client = CookieConfigurableTestClient(app)
 
 # debug
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
@@ -94,7 +95,7 @@ def valid_access_token(create_test_user, request) -> str:
 			db = TestingSessionLocal()
 			db.execute("delete from users")
 			db.commit()
-		except Exception as e:
+		except ObjectDeletedError as e:
 			print(f"exception: {e}")
 
 	request.addfinalizer(delete_user)
@@ -166,23 +167,43 @@ def test_user_profile_success(valid_access_token):
 	assert response.json()["updated_at"] is not None
 
 
-def test_user_profile_invalid_token():
+def test_user_profile_invalid_token(valid_access_token):
 	"""
 		get error for current users profile data because of invalid token
 
+		:param valid_access_token: fixture that adds a jwt cookie (will be over written)
 		:return: Nothing
 	"""
 
+	client.set_access_token('abc')
 	response = client.get(
 		"/api/users/me",
 		headers={
 			'accept': 'application/json',
 			'Content-Type': 'application/json',
-		},
-		cookies={
-			'access_token': 'abc'
 		}
 	)
 
 	assert response.status_code == 401
-	assert response.json() == { 'detail': 'Token is invalid or has expired' }
+	assert response.json() == {'detail': 'Token is invalid or has expired'}
+
+
+def test_user_profile_no_token(valid_access_token):
+	"""
+		get error for current users profile data because of no token
+
+		:param valid_access_token: fixture that adds a jwt cookie (will be over written)
+		:return: Nothing
+	"""
+
+	client.set_access_token('')
+	response = client.get(
+		"/api/users/me",
+		headers={
+			'accept': 'application/json',
+			'Content-Type': 'application/json',
+		}
+	)
+
+	assert response.status_code == 401
+	assert response.json() == {'detail': 'You are not logged in'}
