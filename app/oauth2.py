@@ -18,7 +18,7 @@ class Settings(BaseModel):
 	"""
 	authjwt_algorithm: str = settings.JWT_ALGORITHM
 	authjwt_decode_algorithms: List[str] = [settings.JWT_ALGORITHM]
-	authjwt_token_location: set = {'cookies', 'headers'}
+	authjwt_token_location: set = {'headers', }
 	authjwt_access_cookie_key: str = 'access_token'
 	authjwt_refresh_cookie_key: str = 'refresh_token'
 	authjwt_cookie_csrf_protect: bool = False

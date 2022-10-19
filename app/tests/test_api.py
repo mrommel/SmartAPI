@@ -3,10 +3,10 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import ObjectDeletedError
+from starlette.testclient import TestClient
 
 from app.database import Base, get_db
 from app.main import app
-from app.tests.test_utils import CookieConfigurableTestClient
 
 # Redefining name - for fixtures
 # pylint: disable=W0621
@@ -15,7 +15,7 @@ from app.tests.test_utils import CookieConfigurableTestClient
 # pylint: disable=W0613
 
 
-client = CookieConfigurableTestClient(app)
+client = TestClient(app)
 
 # debug
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
@@ -155,6 +155,7 @@ def test_user_profile_success(valid_access_token):
 		headers={
 			'accept': 'application/json',
 			'Content-Type': 'application/json',
+			'Authorization': f'Bearer {valid_access_token}',
 		},
 	)
 
@@ -175,12 +176,12 @@ def test_user_profile_invalid_token(valid_access_token):
 		:return: Nothing
 	"""
 
-	client.set_access_token('abc')
 	response = client.get(
 		"/api/users/me",
 		headers={
 			'accept': 'application/json',
 			'Content-Type': 'application/json',
+			'Authorization': 'Bearer abc',
 		}
 	)
 
@@ -188,21 +189,43 @@ def test_user_profile_invalid_token(valid_access_token):
 	assert response.json() == {'detail': 'Token is invalid or has expired'}
 
 
-def test_user_profile_no_token(valid_access_token):
+def test_user_profile_empty_token(valid_access_token):
 	"""
-		get error for current users profile data because of no token
+		get error for current users profile data because of empty token
 
-		:param valid_access_token: fixture that adds a jwt cookie (will be over written)
+		:param valid_access_token: fixture that adds a jwt cookie (will be overwritten)
 		:return: Nothing
 	"""
 
-	client.set_access_token('')
 	response = client.get(
 		"/api/users/me",
 		headers={
 			'accept': 'application/json',
 			'Content-Type': 'application/json',
+			'Authorization': '',
 		}
+	)
+
+	assert response.status_code == 401
+	assert response.json() == {'detail': 'You are not logged in'}
+
+
+def test_user_profile_no_token(valid_access_token):
+	"""
+		get error for current users profile data because of no token
+
+		:param valid_access_token: fixture that adds a jwt cookie (will be removed)
+		:return: Nothing
+	"""
+
+	response = client.get(
+		"/api/users/me",
+		headers={
+			'accept': 'application/json',
+			'Content-Type': 'application/json',
+			# no Authorization header at all
+		},
+		cookies={}
 	)
 
 	assert response.status_code == 401
