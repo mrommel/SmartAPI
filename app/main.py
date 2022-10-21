@@ -5,7 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi_jwt_auth.exceptions import AuthJWTException
 from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from app.config import settings
 from app.routers import user, auth
@@ -93,3 +95,11 @@ async def custom_500_handler(request, __):
 		"data": {}
 	}
 	return templates.TemplateResponse("error.html", content)
+
+
+@app.exception_handler(AuthJWTException)
+def authjwt_exception_handler(request: Request, exc: AuthJWTException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message}
+    )

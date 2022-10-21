@@ -39,7 +39,7 @@ class LoginUserSchema(BaseModel):
 	"""
 		schema to log in a user
 	"""
-	email: EmailStr
+	username: EmailStr
 	password: constr(min_length=8)
 
 

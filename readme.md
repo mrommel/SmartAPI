@@ -19,6 +19,10 @@ verify that database is up to date
 
 `docker-compose down`
 
+## start angular app
+
+`npm start`
+
 # Database migration
 
 ## detect changes
@@ -35,5 +39,6 @@ verify that database is up to date
 
 * https://codevoweb.com/restful-api-with-python-fastapi-access-and-refresh-tokens/
 * https://levelup.gitconnected.com/building-a-website-starter-with-fastapi-92d077092864
+* https://rasyue.com/creating-login-system-in-angular-and-fastapi/
 * https://www.w3schools.com/howto/howto_css_login_form.asp
 * https://getbootstrap.com/docs/4.0/components/buttons/

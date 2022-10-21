@@ -62,7 +62,7 @@ def login(payload: schemas.LoginUserSchema, response: Response, db: Session = De
 	"""
 	# Check if the user exist
 	user = db.query(models.User).filter(
-		models.User.email == EmailStr(payload.email.lower())).first()
+		models.User.email == EmailStr(payload.username.lower())).first()
 	if not user:
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
 		                    detail='Incorrect Email or Password')
