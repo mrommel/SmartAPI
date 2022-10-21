@@ -7,11 +7,15 @@
 {% endblock %}
 
 {% block page_content %}
-<h1>
-    {{error}}
-</h1>
-
-
+    <h1>Error</h1>
+    <h2>{{error_title}}</h2>
+    <p>{{error_description}}</p>
+    <ul class="nav navbar-nav ml-auto">
+        <li class="nav-item active">
+            <a class="btn btn-info" href="/">Home</a>
+        </li>
+    </ul>
+    <p>&nbsp;</p>
 {% endblock %}
 
 {% block scripts %}

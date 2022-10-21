@@ -2,8 +2,10 @@
     <div class="container-fluid">
 
         <div class="collapse navbar-collapse">
-            <img src="{{ url_for('static', path='/images/favicon.svg') }}" class="website_logo"/>
-            <span class="website_title">FastAPI powered Website</span>
+            <a href="/">
+                <img src="{{ url_for('static', path='/images/favicon.svg') }}" class="website_logo"/>
+                <span class="website_title">FastAPI powered Website</span>
+            </a>
         </div>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -13,6 +15,9 @@
                     &nbsp;
                 </li>
                 {% if data.logged == 'True' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile">Profile&nbsp;</a>
+                    </li>
                     <li class="nav-item">
                         <!-- Button to open the modal login form -->
                         <button type="button" class="btn btn-danger" onclick="javascript:logout();">

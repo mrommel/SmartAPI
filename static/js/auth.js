@@ -15,7 +15,9 @@ function handleLoginClicked() {
         success: function(response) {
             console.log('success: ' + JSON.stringify(response));
             document.getElementById('login_form').style.display='none';
-            window.location.href = window.location.href;
+            setTimeout(function() {
+                window.location.reload();
+            }, 3);
         },
         error: function(xhr, textStatus, exception) {
             handleError(xhr, textStatus, exception);

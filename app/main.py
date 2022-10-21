@@ -45,6 +45,20 @@ async def home(request: Request):
 	return templates.TemplateResponse("index.html", {"request": request, "data": data})
 
 
+@app.get('/profile', response_class=HTMLResponse)
+def profile(request: Request):
+	logged_in = False
+	if 'logged_in' in request.cookies:
+		logged_in = bool(request.cookies['logged_in'])
+		print(f'logged_in={logged_in}')
+
+	data = {
+		"page": "Profile",
+		"logged": f'{logged_in}'
+	}
+	return templates.TemplateResponse("profile.html", {"request": request, "data": data})
+
+
 @app.get('/api/healthchecker')
 def root():
 	"""
@@ -57,9 +71,25 @@ def root():
 
 @app.exception_handler(404)
 async def custom_404_handler(request, __):
-	return templates.TemplateResponse("error.html", {"request": request, "error": "404"})
+	content = {
+		"request": request,
+		"error_title": "404 Not Found",
+		"error_description": "The server can not find the requested resource. In the browser, this means the URL is "
+		                     "not recognized. In an API, this can also mean that the endpoint is valid but the "
+		                     "resource itself does not exist. Servers may also send this response instead of 403 "
+		                     "Forbidden to hide the existence of a resource from an unauthorized client. This response "
+		                     "code is probably the most well known due to its frequent occurrence on the web.",
+		"data": {}
+	}
+	return templates.TemplateResponse("error.html", content)
 
 
 @app.exception_handler(500)
 async def custom_500_handler(request, __):
-	return templates.TemplateResponse("error.html", {"request": request, "error": "500"})
+	content = {
+		"request": request,
+		"error_title": "500 Internal Server Error",
+		"error_description": "The server has encountered a situation it does not know how to handle.",
+		"data": {}
+	}
+	return templates.TemplateResponse("error.html", content)

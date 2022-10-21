@@ -33,22 +33,19 @@
 </head>
 
 <body>
-    <div class="wrapper">
+    <div class="page-container">
         <!-- Page Content  -->
         <div id="content">
             {% include 'include/header.html' %}
             {% block page_content %}
             {% endblock %}
-
-            <div class="footer-clean">
-                {% include 'include/footer.html' %}
-            </div>
+        </div>
+        <div class="footer-clean">
+            {% include 'include/footer.html' %}
         </div>
     </div>
-    <div class="overlay"></div>
 
     {% block scripts %}
-
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <!-- Popper.JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
@@ -66,22 +63,6 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            $("#sidebar").mCustomScrollbar({
-                theme: "minimal"
-            });
-
-            $('#dismiss, .overlay').on('click', function () {
-                $('#sidebar').removeClass('active');
-                $('.overlay').removeClass('active');
-            });
-
-            $('#sidebarCollapse').on('click', function () {
-                $('#sidebar').addClass('active');
-                $('.overlay').addClass('active');
-                $('.collapse.in').toggleClass('in');
-                $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-            });
-
             $('#btn_login').click(function() {
                 handleLoginClicked();
                 return false; // dont send the form
