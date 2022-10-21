@@ -3,19 +3,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from alembic.config import Config
 
 from .config import settings
 
-__config_path__ = "../alembic.ini"
-__migration_path__ = "../alembic/env.py"
-
-cfg = Config(__config_path__)
-cfg.set_main_option("script_location", __migration_path__)
-
-
 SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@" \
-                          f"{settings.POSTGRES_HOSTNAME}:{settings.DATABASE_PORT}/{settings.POSTGRES_DB} "
+                          f"{settings.POSTGRES_HOSTNAME}:{settings.DATABASE_PORT}/{settings.POSTGRES_DB}"
+# print(SQLALCHEMY_DATABASE_URL)
 
 engine = create_engine(
 	SQLALCHEMY_DATABASE_URL

@@ -18,7 +18,7 @@ class Settings(BaseModel):
 	"""
 	authjwt_algorithm: str = settings.JWT_ALGORITHM
 	authjwt_decode_algorithms: List[str] = [settings.JWT_ALGORITHM]
-	authjwt_token_location: set = {'headers', }
+	authjwt_token_location: set = {'headers', 'cookies'}
 	authjwt_access_cookie_key: str = 'access_token'
 	authjwt_refresh_cookie_key: str = 'refresh_token'
 	authjwt_cookie_csrf_protect: bool = False
@@ -48,17 +48,17 @@ class UserNotFound(Exception):
 	"""
 
 
-def require_user(db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
+def require_user(db: Session = Depends(get_db), authorize: AuthJWT = Depends()):
 	"""
 		check if user is in security context
 
 		:param db:
-		:param Authorize: security context
+		:param authorize: security context
 		:return: user_id or exception
 	"""
 	try:
-		Authorize.jwt_required()
-		user_id = Authorize.get_jwt_subject()
+		authorize.jwt_required()
+		user_id = authorize.get_jwt_subject()
 		user = db.query(models.User).filter(models.User.id == user_id).first()
 
 		if not user:

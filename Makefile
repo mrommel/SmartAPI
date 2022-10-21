@@ -19,7 +19,7 @@ tests: venv
 	pytest -ra
 
 run: venv
-	uvicorn app.main:app --host localhost --port 8000 --reload
+	./$(VENV)/bin/uvicorn app.main:app --host localhost --port 8000 --reload
 
 start-db: venv
 	docker-compose up -d

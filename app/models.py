@@ -54,7 +54,6 @@ class GUID(TypeDecorator):
 		by instances of this type, if known."""
 
 
-
 class User(Base):
 	"""
 		model of a user (maps to db class)

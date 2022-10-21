@@ -17,7 +17,7 @@ REFRESH_TOKEN_EXPIRES_IN = settings.REFRESH_TOKEN_EXPIRES_IN
 
 
 # Register a new user
-@router.post('/register', status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse)
+@router.post('/signup', status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse)
 async def create_user(payload: schemas.CreateUserSchema, db: Session = Depends(get_db)):
 	"""
 		end-point to create a new user
@@ -48,14 +48,14 @@ async def create_user(payload: schemas.CreateUserSchema, db: Session = Depends(g
 # Login user
 @router.post('/login')
 def login(payload: schemas.LoginUserSchema, response: Response, db: Session = Depends(get_db),
-		Authorize: AuthJWT = Depends()):
+          authorize: AuthJWT = Depends()):
 	"""
-		end-point to login a user
+		end-point to log in a user
 
 		:param payload: user data
 		:param response: response object
 		:param db: database session (is automatically generated)
-		:param Authorize: security context
+		:param authorize: security context
 		:return: status and the access token
 	"""
 	# Check if the user exist
@@ -76,11 +76,11 @@ def login(payload: schemas.LoginUserSchema, response: Response, db: Session = De
 		                    detail='Incorrect Email or Password')
 
 	# Create access token
-	access_token_value = Authorize.create_access_token(
+	access_token_value = authorize.create_access_token(
 		subject=str(user.id), expires_time=timedelta(minutes=ACCESS_TOKEN_EXPIRES_IN))
 
 	# Create refresh token
-	refresh_token_value = Authorize.create_refresh_token(
+	refresh_token_value = authorize.create_refresh_token(
 		subject=str(user.id), expires_time=timedelta(minutes=REFRESH_TOKEN_EXPIRES_IN))
 
 	# Store refresh and access tokens in cookie
@@ -97,7 +97,7 @@ def login(payload: schemas.LoginUserSchema, response: Response, db: Session = De
 
 # Refresh access token
 @router.get('/refresh')
-def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+def refresh_token(response: Response, request: Request, authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
 	"""
 
 		:param response:
@@ -107,19 +107,19 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 		:return:
 	"""
 	try:
-		Authorize.jwt_refresh_token_required()
+		authorize.jwt_refresh_token_required()
 
 		print(request.scope)
 
-		user_id = Authorize.get_jwt_subject()
+		user_id = authorize.get_jwt_subject()
 		if not user_id:
 			raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-								detail='Could not refresh access token')
+			                    detail='Could not refresh access token')
 		user = db.query(models.User).filter(models.User.id == user_id).first()
 		if not user:
 			raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-								detail='The user belonging to this token no logger exist')
-		access_token = Authorize.create_access_token(
+			                    detail='The user belonging to this token no logger exist')
+		access_token = authorize.create_access_token(
 			subject=str(user.id), expires_time=timedelta(minutes=ACCESS_TOKEN_EXPIRES_IN))
 	except Exception as e:
 		error = e.__class__.__name__
@@ -129,24 +129,24 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error) from e
 
 	response.set_cookie('access_token', access_token, ACCESS_TOKEN_EXPIRES_IN * 60,
-						ACCESS_TOKEN_EXPIRES_IN * 60, '/', None, False, True, 'lax')
+	                    ACCESS_TOKEN_EXPIRES_IN * 60, '/', None, False, True, 'lax')
 	response.set_cookie('logged_in', 'True', ACCESS_TOKEN_EXPIRES_IN * 60,
-						ACCESS_TOKEN_EXPIRES_IN * 60, '/', None, False, False, 'lax')
+	                    ACCESS_TOKEN_EXPIRES_IN * 60, '/', None, False, False, 'lax')
 	return {'access_token': access_token}
 
 
 # Logout user
 @router.get('/logout', status_code=status.HTTP_200_OK)
-def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = Depends(oauth2.require_user)):
+def logout(response: Response, authorize: AuthJWT = Depends(), user_id: str = Depends(oauth2.require_user)):
 	"""
 		end-point to log the current user out
 
 		:param response: context
-		:param Authorize: security context
+		:param authorize: security context
 		:param user_id: username to be logged out (retrieved from context)
 	"""
-	Authorize.unset_jwt_cookies()
+	authorize.unset_jwt_cookies()
 	response.set_cookie('logged_in', '', -1)
-	print(user_id)
+	# print(user_id)
 
 	return {'status': 'success'}
