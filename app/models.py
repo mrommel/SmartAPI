@@ -26,6 +26,24 @@ class GenderChoices(enum.Enum):
 		return [c.value for c in GenderChoices]
 
 
+class RoleChoices(enum.Enum):
+	"""
+		enum that contains role choices
+	"""
+	USER = 'user'
+	IBD = 'ibd'
+	OEM = 'oem'
+
+	@staticmethod
+	def fetch_names():
+		"""
+			get array with enum names
+
+			:return: array with enum names
+		"""
+		return [c.value for c in RoleChoices]
+
+
 class User(Base):
 	"""
 		model of a user (maps to db class)
@@ -36,9 +54,11 @@ class User(Base):
 	email = Column(String, unique=True, nullable=False)
 	password = Column(String, nullable=False)
 	photo = Column(String, nullable=True)
-	gender = Column(Enum(GenderChoices, values_callable=lambda x: [str(member.value) for member in GenderChoices]))
+	gender = Column(Enum(GenderChoices, values_callable=lambda x: [str(member.value) for member in GenderChoices]),
+	                server_default='other')
 	verified = Column(Boolean, nullable=False, server_default='False')
-	role = Column(String, server_default='user', nullable=False)
+	role = Column(Enum(GenderChoices, values_callable=lambda x: [str(member.value) for member in GenderChoices]),
+	              server_default='user', nullable=False)
 
 	created_at = Column(DateTime, default=func.current_timestamp())
 	updated_at = Column(DateTime, default=func.current_timestamp(), onupdate=func.current_timestamp())

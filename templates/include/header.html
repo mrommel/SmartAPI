@@ -14,7 +14,7 @@
                     <a class="nav-link" href="/">Home</a>
                     &nbsp;
                 </li>
-                {% if data.logged == 'True' %}
+                {% if data is defined and data.logged == 'True' %}
                     <li class="nav-item">
                         <a class="nav-link" href="/profile">Profile&nbsp;</a>
                     </li>

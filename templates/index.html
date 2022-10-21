@@ -10,8 +10,10 @@
 <h1>
     Welcome
 </h1>
-<p>Page: {{data.page}}</p>
-<!--<p>Logged: {{data.logged}}</p>-->
+{% if data is defined %}
+    <p>Page: {{data.page}}</p>
+    <!--<p>Logged: {{data.logged}}</p>-->
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
