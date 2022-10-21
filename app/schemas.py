@@ -6,6 +6,8 @@ from typing import List, Optional
 from pydantic import BaseModel, EmailStr, constr
 from starlette.requests import Request
 
+from app.models import RoleChoices, GenderChoices
+
 
 class UserBaseSchema(BaseModel):
 	"""
@@ -28,7 +30,8 @@ class CreateUserSchema(UserBaseSchema):
 	"""
 	password: constr(min_length=8)
 	passwordConfirm: str
-	role: str = 'user'
+	role: str = RoleChoices.USER.value
+	gender: str = GenderChoices.MALE.value
 	verified: bool = False
 
 

@@ -10,6 +10,7 @@ from app.oauth2 import AuthJWT
 from .. import schemas, models, utils
 from ..config import settings
 from ..database import get_db
+from ..models import RoleChoices, GenderChoices
 
 router = APIRouter()
 ACCESS_TOKEN_EXPIRES_IN = settings.ACCESS_TOKEN_EXPIRES_IN
@@ -35,7 +36,8 @@ async def create_user(payload: schemas.CreateUserSchema, db: Session = Depends(g
 	#  Hash the password
 	payload.password = utils.hash_password(payload.password)
 	del payload.passwordConfirm
-	payload.role = 'user'
+	payload.role = RoleChoices.USER.value
+	payload.gender = GenderChoices.MALE.value
 	payload.verified = True
 	payload.email = EmailStr(payload.email.lower())
 	new_user = models.User(**payload.dict())

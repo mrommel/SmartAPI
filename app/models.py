@@ -30,9 +30,9 @@ class RoleChoices(enum.Enum):
 	"""
 		enum that contains role choices
 	"""
-	USER = 'user'
-	IBD = 'ibd'
-	OEM = 'oem'
+	USER = 'User'
+	IBD = 'IBD'
+	OEM = 'OEM'
 
 	@staticmethod
 	def fetch_names():
@@ -55,10 +55,10 @@ class User(Base):
 	password = Column(String, nullable=False)
 	photo = Column(String, nullable=True)
 	gender = Column(Enum(GenderChoices, values_callable=lambda x: [str(member.value) for member in GenderChoices]),
-	                server_default='other')
+	                server_default='Other')
 	verified = Column(Boolean, nullable=False, server_default='False')
-	role = Column(Enum(GenderChoices, values_callable=lambda x: [str(member.value) for member in GenderChoices]),
-	              server_default='user', nullable=False)
+	role = Column(Enum(RoleChoices, values_callable=lambda x: [str(member.value) for member in RoleChoices]),
+	              server_default='User', nullable=False)
 
 	created_at = Column(DateTime, default=func.current_timestamp())
 	updated_at = Column(DateTime, default=func.current_timestamp(), onupdate=func.current_timestamp())
