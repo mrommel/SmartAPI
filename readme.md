@@ -19,6 +19,18 @@ verify that database is up to date
 
 `docker-compose down`
 
+# Database migration
+
+## detect changes
+
+`alembic revision --autogenerate -m "text"`
+
+(maybe the migration needs to refined)
+
+## apply changes to database
+
+`alembic upgrade head`
+
 # Links
 
 * https://codevoweb.com/restful-api-with-python-fastapi-access-and-refresh-tokens/
