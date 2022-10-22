@@ -1,10 +1,8 @@
 """schema module"""
 import uuid
 from datetime import datetime
-from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr, constr
-from starlette.requests import Request
 
 from app.models import RoleChoices, GenderChoices
 

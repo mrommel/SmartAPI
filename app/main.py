@@ -35,6 +35,12 @@ app.include_router(user.router, tags=['Users'], prefix='/api/users')
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+	"""
+		home page
+
+		:param request: request
+		:return:
+	"""
 	logged_in = False
 	if 'logged_in' in request.cookies:
 		logged_in = bool(request.cookies['logged_in'])
@@ -49,6 +55,12 @@ async def home(request: Request):
 
 @app.get('/profile', response_class=HTMLResponse)
 def profile(request: Request):
+	"""
+		profile page
+
+		:param request: request
+		:return:
+	"""
 	logged_in = False
 	if 'logged_in' in request.cookies:
 		logged_in = bool(request.cookies['logged_in'])
@@ -73,6 +85,13 @@ def root():
 
 @app.exception_handler(404)
 async def custom_404_handler(request, __):
+	"""
+		404 error page
+
+		:param request: request
+		:param __: empty
+		:return: HTMLResponse
+	"""
 	content = {
 		"request": request,
 		"error_title": "404 Not Found",
@@ -88,6 +107,13 @@ async def custom_404_handler(request, __):
 
 @app.exception_handler(500)
 async def custom_500_handler(request, __):
+	"""
+		handle 500 error
+
+		:param request: requesr
+		:param __: empty
+		:return: HTMLResponse
+	"""
 	content = {
 		"request": request,
 		"error_title": "500 Internal Server Error",
@@ -98,8 +124,14 @@ async def custom_500_handler(request, __):
 
 
 @app.exception_handler(AuthJWTException)
-def authjwt_exception_handler(request: Request, exc: AuthJWTException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.message}
-    )
+def authjwt_exception_handler(exc: AuthJWTException):
+	"""
+		jwt error page
+
+		:param exc: exception
+		:return: HTMLResponse
+	"""
+	return JSONResponse(
+		status_code=exc.status_code,
+		content={"detail": exc.message}
+	)

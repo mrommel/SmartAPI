@@ -1,4 +1,6 @@
 """test module"""
+from http.cookiejar import CookieJar
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -51,14 +53,15 @@ def create_test_user():
 		:return: Nothing
 	"""
 	signup_response = client.post(
-		"/api/auth/register",
+		"/api/auth/signup",
 		json={
 			"name": "string",
 			"email": "sample@abc.de",
 			"photo": "abc.jpg",
 			"password": "secret123",
 			"passwordConfirm": "secret123",
-			"role": "user",
+			"role": "User",
+			"gender": "Male",
 			"verified": "true"
 		},
 	)
@@ -83,9 +86,10 @@ def valid_access_token(create_test_user, request) -> str:
 		:param create_test_user: fixture to create a test user
 		:return: access_token
 	"""
+	# client.headers = {"Content-type": "application/json"}
 	login_response = client.post(
 		"/api/auth/login",
-		json={"email": "sample@abc.de", "password": "secret123"},
+		json={"username": "sample@abc.de", "password": "secret123"},
 	)
 	assert login_response.status_code == 200
 	assert login_response.json()["access_token"] is not None
@@ -133,7 +137,7 @@ def test_login_wrong_password():
 	"""
 	response = client.post(
 		"/api/auth/login",
-		json={"email": "abdulazeez@x.com", "password": "weakpassword"},
+		json={"username": "abdulazeez@x.com", "password": "weakpassword"},
 	)
 
 	assert response.status_code == 400
@@ -196,7 +200,7 @@ def test_user_profile_empty_token(valid_access_token):
 		:param valid_access_token: fixture that adds a jwt cookie (will be overwritten)
 		:return: Nothing
 	"""
-
+	client.cookies = CookieJar()
 	response = client.get(
 		"/api/users/me",
 		headers={
@@ -206,6 +210,7 @@ def test_user_profile_empty_token(valid_access_token):
 		}
 	)
 
+	print(response.json())
 	assert response.status_code == 401
 	assert response.json() == {'detail': 'You are not logged in'}
 
@@ -217,7 +222,7 @@ def test_user_profile_no_token(valid_access_token):
 		:param valid_access_token: fixture that adds a jwt cookie (will be removed)
 		:return: Nothing
 	"""
-
+	client.cookies = CookieJar()
 	response = client.get(
 		"/api/users/me",
 		headers={

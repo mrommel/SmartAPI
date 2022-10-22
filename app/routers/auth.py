@@ -149,6 +149,6 @@ def logout(response: Response, authorize: AuthJWT = Depends(), user_id: str = De
 	"""
 	authorize.unset_jwt_cookies()
 	response.set_cookie('logged_in', '', -1)
-	# print(user_id)
+	print(user_id)  # to prevent warning
 
 	return {'status': 'success'}
