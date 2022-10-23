@@ -15,17 +15,16 @@ pylint: venv
 	./$(VENV)/bin/pylint --disable=C0303,R0903,R0915,C0103,E1101,E0102,R0913,W0123,R0912,R0801 --extension-pkg-whitelist='pydantic' app
 
 tests: venv
-	#./$(VENV)/bin/python3 -m unittest
-	pytest -ra
+	pytest -q app/tests/test_api.py
+
+coverage: venv
+	coverage run -m pytest -q app/tests/test_api.py && coverage report -m
 
 run: venv
 	./$(VENV)/bin/uvicorn app.main:app --host localhost --port 8000 --reload
 
 start-db: venv
 	docker-compose up -d
-
-# wsgi: venv
-#	./$(VENV)/bin/python3 -m flask run
 
 clean:
 	rm -rf $(VENV)

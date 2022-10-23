@@ -129,7 +129,7 @@ def test_login_successfully(valid_access_token):
 	assert valid_access_token is not None
 
 
-def test_login_wrong_password():
+def test_login_wrong_username_and_password():
 	"""
 		verify that wrong credentials cannot be used
 
@@ -138,6 +138,23 @@ def test_login_wrong_password():
 	response = client.post(
 		"/api/auth/login",
 		json={"username": "abdulazeez@x.com", "password": "weakpassword"},
+	)
+
+	assert response.status_code == 400
+	assert response.json() == {
+		'detail': 'Incorrect Email or Password',
+	}
+
+
+def test_login_valid_username_and_wrong_password():
+	"""
+		verify that wrong credentials cannot be used
+
+		:return: Nothing
+	"""
+	response = client.post(
+		"/api/auth/login",
+		json={"username": "sample@abc.de", "password": "weakpassword"},
 	)
 
 	assert response.status_code == 400
@@ -172,11 +189,10 @@ def test_user_profile_success(valid_access_token):
 	assert response.json()["updated_at"] is not None
 
 
-def test_user_profile_invalid_token(valid_access_token):
+def test_user_profile_invalid_token():
 	"""
 		get error for current users profile data because of invalid token
 
-		:param valid_access_token: fixture that adds a jwt cookie (will be over written)
 		:return: Nothing
 	"""
 
@@ -193,11 +209,10 @@ def test_user_profile_invalid_token(valid_access_token):
 	assert response.json() == {'detail': 'Token is invalid or has expired'}
 
 
-def test_user_profile_empty_token(valid_access_token):
+def test_user_profile_empty_token():
 	"""
 		get error for current users profile data because of empty token
 
-		:param valid_access_token: fixture that adds a jwt cookie (will be overwritten)
 		:return: Nothing
 	"""
 	client.cookies = CookieJar()
@@ -210,16 +225,14 @@ def test_user_profile_empty_token(valid_access_token):
 		}
 	)
 
-	print(response.json())
 	assert response.status_code == 401
 	assert response.json() == {'detail': 'You are not logged in'}
 
 
-def test_user_profile_no_token(valid_access_token):
+def test_user_profile_no_token():
 	"""
 		get error for current users profile data because of no token
 
-		:param valid_access_token: fixture that adds a jwt cookie (will be removed)
 		:return: Nothing
 	"""
 	client.cookies = CookieJar()

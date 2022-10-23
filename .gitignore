@@ -3,3 +3,4 @@ venv/
 .idea
 db.sqlite
 test.db
+.coverage
