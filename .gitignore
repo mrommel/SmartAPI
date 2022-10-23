@@ -4,3 +4,5 @@ venv/
 db.sqlite
 test.db
 .coverage
+test.sqlite
+app/tests/test.sqlite
