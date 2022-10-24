@@ -10,7 +10,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from app.config import settings
-from app.routers import user, auth
+from app.routers import user, auth, check
 
 app = FastAPI()
 
@@ -31,6 +31,7 @@ app.add_middleware(
 
 app.include_router(auth.router, tags=['Auth'], prefix='/api/auth')
 app.include_router(user.router, tags=['Users'], prefix='/api/users')
+app.include_router(check.router, tags=['Checks'], prefix='/api/checks')
 
 
 @app.get("/", response_class=HTMLResponse)

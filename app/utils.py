@@ -1,4 +1,5 @@
 """utils module"""
+import time
 import uuid
 
 from passlib.context import CryptContext
@@ -74,3 +75,36 @@ class GUID(TypeDecorator):
 	def python_type(self):
 		"""Return the Python type object expected to be returned
 		by instances of this type, if known."""
+
+
+class CheckTaskState:
+
+	def __init__(self):
+		self.urls = [
+			'http://www.google.de',
+			'http://www.amazon.de',
+			'http://www.realtek.de',
+			'http://www.avm.de'
+		]
+		self.current_index = len(self.urls)
+
+	def _check_url(self, url: str):
+		print(f'check url: {url}')
+		time.sleep(5)
+
+	def check_background_work(self):
+		self.current_index = 0
+		for url in self.urls:
+			self._check_url(url)
+			self.current_index += 1
+
+	def get_state(self):
+		status = 'ready'
+
+		if self.current_index < len(self.urls):
+			status = 'running'
+
+		return {'status': status}
+
+
+check_state = CheckTaskState()
