@@ -2,7 +2,8 @@
 import enum
 import uuid
 
-from sqlalchemy import Column, String, Boolean, DateTime, func, Enum
+from sqlalchemy import Column, String, Boolean, DateTime, func, Enum, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 
 from .database import Base
 from .utils import GUID
@@ -59,6 +60,41 @@ class User(Base):
 	verified = Column(Boolean, nullable=False, server_default='False')
 	role = Column(Enum(RoleChoices, values_callable=lambda x: [str(member.value) for member in RoleChoices]),
 	              server_default='User', nullable=False)
+
+	created_at = Column(DateTime, default=func.current_timestamp())
+	updated_at = Column(DateTime, default=func.current_timestamp(), onupdate=func.current_timestamp())
+
+
+class ActionChoices(enum.Enum):
+	"""
+		enum that contains action choices
+	"""
+	IGNORE = 'Ignore'
+	DOWNLOADED = 'Download'
+	PENDING = 'Pending'
+
+	@staticmethod
+	def fetch_names():
+		"""
+			get array with enum names
+
+			:return: array with enum names
+		"""
+		return [c.value for c in ActionChoices]
+
+
+class Video(Base):
+	"""
+		model of a video (maps to db class)
+	"""
+	__tablename__ = 'videos'
+	id = Column(GUID(), primary_key=True, nullable=False, default=uuid.uuid4)
+	video_id = Column(String, unique=True, nullable=False)
+	title = Column(String, unique=True, nullable=False)
+	duration = Column(Integer, nullable=False)
+
+	action = Column(Enum(ActionChoices, values_callable=lambda x: [str(member.value) for member in ActionChoices]),
+	                server_default='Pending')
 
 	created_at = Column(DateTime, default=func.current_timestamp())
 	updated_at = Column(DateTime, default=func.current_timestamp(), onupdate=func.current_timestamp())

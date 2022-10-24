@@ -1,10 +1,14 @@
 """utils module"""
 import time
 import uuid
+import requests
 
 from passlib.context import CryptContext
 from sqlalchemy import TypeDecorator, CHAR
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Session
+
+from app import models
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -77,32 +81,89 @@ class GUID(TypeDecorator):
 		by instances of this type, if known."""
 
 
+class CheckContent:
+	def __init__(self, query: str, min_duration: int):
+		self.query = query
+		self.min_duration = min_duration
+
+	def url(self) -> str:
+		host = 'https://api.dailymotion.com'
+		field = 'id,title,duration'
+		language = 'de'
+		return f'{host}/videos?fields={field}&search={self.query}&limit=50&languages={language}' \
+		       f'&longer_than={self.min_duration}&sort=recent'
+
+
+class VideoItem(object):
+	def __init__(self, id: str, title: str, duration: int):
+		self.video_id = id
+		self.title = title
+		self.duration = duration
+
+	def __repr__(self):
+		return f'<video id={self.video_id}, title="{self.title}", duration={self.duration}>'
+
+
+class VideoListItem(object):
+	def __init__(self, page: int, limit: int, explicit, total, has_more, list: [VideoItem]):
+		self.page = page
+		self.limit = limit
+		self.explicit = explicit
+		self.total = total
+		self.has_more = has_more
+		self.videos = list
+
+	def __repr__(self):
+		return f'<videolist({self.total}) = [{self.videos}]>'
+
+
 class CheckTaskState:
 
 	def __init__(self):
-		self.urls = [
-			'http://www.google.de',
-			'http://www.amazon.de',
-			'http://www.realtek.de',
-			'http://www.avm.de'
+		self.checks = [
+			CheckContent(query='scrubs%20anf%C3%A4nger', min_duration=25),
+			CheckContent(query='%22big%20bang%20theory%22', min_duration=20),
+			CheckContent(query='%22how%20i%20met%20your%20mother%22', min_duration=15),
+			CheckContent(query='tng', min_duration=40),
+			CheckContent(query='%22next%20generation%22', min_duration=40),
+			CheckContent(query='picard', min_duration=30),
 		]
-		self.current_index = len(self.urls)
+		self.current_index = len(self.checks)
 
-	def _check_url(self, url: str):
-		print(f'check url: {url}')
-		time.sleep(5)
+	def _check_url(self, url: str, db: Session):
+		response = requests.get(url)
+		video_list = VideoListItem(**response.json())
 
-	def check_background_work(self):
+		for video in video_list.videos:
+			existing_video = db.query(models.Video).filter(models.Video.video_id == video['id']).first()
+
+			if existing_video:
+				continue
+
+			payload = dict()
+			payload['video_id'] = video['id']
+			payload['title'] = video['title']
+			payload['duration'] = video['duration']
+			payload['action'] = 'Pending'  # cannot import ActionChoices (circular import)
+			new_video = models.Video(**payload)
+			db.add(new_video)
+
+		db.commit()
+
+		time.sleep(2)
+
+	def check_background_work(self, db: Session):
 		self.current_index = 0
-		for url in self.urls:
-			self._check_url(url)
+		for check in self.checks:
+			self._check_url(check.url(), db)
 			self.current_index += 1
+		print('checked all {len(self.checks)} items')
 
 	def get_state(self):
 		status = 'ready'
 
 		if self.current_index < len(self.urls):
-			status = 'running'
+			status = 'running ({self.current_index} / {len(self.urls)})'
 
 		return {'status': status}
 

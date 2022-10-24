@@ -2,7 +2,7 @@
 
 function handleLoginClicked() {
     var formData = {
-        email: $("#login_email").val(),
+        username: $("#login_email").val(),
         password: $("#login_password").val(),
     };
 

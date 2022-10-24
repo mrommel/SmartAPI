@@ -42,3 +42,4 @@ verify that database is up to date
 * https://rasyue.com/creating-login-system-in-angular-and-fastapi/
 * https://www.w3schools.com/howto/howto_css_login_form.asp
 * https://getbootstrap.com/docs/4.0/components/buttons/
+* https://fontawesome.com/search

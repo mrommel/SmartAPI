@@ -34,7 +34,7 @@ app.include_router(user.router, tags=['Users'], prefix='/api/users')
 app.include_router(check.router, tags=['Checks'], prefix='/api/checks')
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", tags=['Website'], response_class=HTMLResponse)
 async def home(request: Request):
 	"""
 		home page
@@ -54,7 +54,7 @@ async def home(request: Request):
 	return templates.TemplateResponse("index.html", {"request": request, "data": data})
 
 
-@app.get('/profile', response_class=HTMLResponse)
+@app.get('/profile', tags=['Website'], response_class=HTMLResponse)
 def profile(request: Request):
 	"""
 		profile page
@@ -74,7 +74,27 @@ def profile(request: Request):
 	return templates.TemplateResponse("profile.html", {"request": request, "data": data})
 
 
-@app.get('/api/healthchecker')
+@app.get('/checks', tags=['Website'], response_class=HTMLResponse)
+def checks(request: Request):
+	"""
+		checks page
+
+		:param request: request
+		:return:
+	"""
+	logged_in = False
+	if 'logged_in' in request.cookies:
+		logged_in = bool(request.cookies['logged_in'])
+		print(f'logged_in={logged_in}')
+
+	data = {
+		"page": "Checks",
+		"logged": f'{logged_in}',
+	}
+	return templates.TemplateResponse("checks.html", {"request": request, "data": data})
+
+
+@app.get('/api/healthchecker', tags=['Health'])
 def root():
 	"""
 		sample end-point

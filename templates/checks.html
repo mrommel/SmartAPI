@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}FastAPI powered Website{% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+{% block page_content %}
+<h1>
+    Checks
+</h1>
+<div class="container rounded bg-white mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table" id="checksTable">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Video</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">?</th>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--<p>Page: {{data.page}}</p>-->
+<!--<p>Logged: {{data.logged}}</p>-->
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+    String.prototype.toHHMMSS = function () {
+        var sec_num = parseInt(this, 10); // don't forget the second param
+        var hours   = Math.floor(sec_num / 3600);
+        var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+        var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+        if (hours   < 10) {hours   = "0"+hours;}
+        if (minutes < 10) {minutes = "0"+minutes;}
+        if (seconds < 10) {seconds = "0"+seconds;}
+        return hours + ':' + minutes + ':' + seconds;
+    }
+
+    function download(video_id) {
+        console.log('start downloading ' + video_id);
+    }
+
+    function ignore(video_id) {
+        console.log('start ignoring ' + video_id);
+    }
+
+    $(document).ready(function () {
+        console.log('check login');
+
+        $.ajax({
+            type:"GET",
+            url: "/api/checks/checks",
+            success: function(response) {
+                // console.log('success: ' + JSON.stringify(response));
+
+                // clear table
+                $('#checksTable > tbody').empty();
+
+                var index = 0;
+                response.videos.forEach(video => {
+                  // console.log('video: ' + video);
+                  var download_btn = '<button type="button" class="btn btn-danger" onclick="javascript:download(\'' + video.video_id + '\');"><i class="fa-solid fa-download"></i></button>';
+                  var ignore_btn = '<button type="button" class="btn btn-secondary" onclick="javascript:ignore(\'' + video.video_id + '\');"><i class="fa-solid fa-ban"></i></button>';
+                  $('#checksTable > tbody:last-child').append('<tr><td>' + index + '</td><td>' + video.video_id + '</td><td>' + video.title + '</td><td>' + video.duration.toString().toHHMMSS() + '</td><td>' + download_btn + ' | ' + ignore_btn + '</td></tr>');
+                  index += 1;
+                });
+            },
+            error: function(xhr, textStatus, exception) {
+                handleError(xhr, textStatus, exception);
+                window.location.href = '/'; // redirect to home page
+            }
+        });
+    });
+</script>
+{% endblock %}
