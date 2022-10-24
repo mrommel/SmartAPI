@@ -3,7 +3,7 @@
 
         <div class="collapse navbar-collapse">
             <a href="/">
-                <img src="{{ url_for('static', path='/images/favicon.svg') }}" class="website_logo"/>
+                <img src="{{ url_for('static', path='/images/favicon.svg') }}" class="website_logo" />
                 <span class="website_title">FastAPI powered Website</span>
             </a>
         </div>
@@ -17,6 +17,9 @@
                 {% if data is defined and data.logged == 'True' %}
                     <li class="nav-item">
                         <a class="nav-link" href="/profile">Profile&nbsp;</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/checks">Checks&nbsp;</a>
                     </li>
                     <li class="nav-item">
                         <!-- Button to open the modal login form -->
@@ -94,7 +97,7 @@
                 <label for="signup_email"><b>Email</b></label>
                 <input class="w3-input w3-border" type="text" placeholder="Enter Email" id="signup_email" name="signup_email" required>
 
-                <label for="signup_name"><b>Email</b></label>
+                <label for="signup_name"><b>Username</b></label>
                 <input class="w3-input w3-border" type="text" placeholder="Enter Name" id="signup_name" name="signup_name" required>
 
                 <label for="signup_password"><b>Password</b></label>

@@ -13,6 +13,15 @@
 <div class="container rounded bg-white mt-5 mb-5">
     <div class="row">
         <div class="col-md-12">
+            <div class="actions">
+                <button type="button" class="btn btn-success" id="refresh_button" onclick="javascript:refreshVideos();"><i class="fa-solid fa-refresh"></i></button>
+                <p id="refresh_actions"><span id="refresh_status">not started</span></p>
+                <img src="{{ url_for('static', path='/images/loading.gif') }}" id="refresh_img" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
             <table class="table" id="checksTable">
                 <thead class="thead-light">
                     <tr>
@@ -61,6 +70,79 @@
 
     function ignore(video_id) {
         console.log('start ignoring ' + video_id);
+
+        var formData = {
+            video_id: video_id,
+        };
+
+        $.ajax({
+            type:"POST",
+            url: "/api/checks/ignore",
+            contentType: "application/json",
+            data: JSON.stringify(formData),
+            dataType: "json",
+            success: function(response) {
+                console.log('ignored video ' + video_id);
+
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1);
+            },
+            error: function(xhr, textStatus, exception) {
+                handleError(xhr, textStatus, exception);
+            }
+        });
+    }
+
+    var check_timer;
+    function checkStatusWorker() {
+        $.ajax({
+            type:"GET",
+            url: "/api/checks/status",
+            success: function(response) {
+                console.log('refresh videos status: ' + response.status);
+
+                $('#refresh_status').text(response.status);
+                if (response.status == 'ready') {
+                    abortTimer();
+                    $('#refresh_status').hide();
+                    $('#refresh_img').hide();
+
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1);
+                }
+            },
+            error: function(xhr, textStatus, exception) {
+                handleError(xhr, textStatus, exception);
+            }
+        });
+    }
+
+    // to be called when you want to stop the timer
+    function abortTimer() {
+        clearInterval(check_timer);
+    }
+
+    function refreshVideos() {
+        console.log('refresh videos');
+        $('#refresh_button').removeClass('btn-success');
+        $('#refresh_button').addClass('btn-secondary');
+        $('#refresh_status').show();
+        $('#refresh_img').show();
+
+        $.ajax({
+            type:"POST",
+            url: "/api/checks/start",
+            success: function(response) {
+                console.log('refresh videos started');
+
+                check_timer = setInterval(checkStatusWorker, 1000);
+            },
+            error: function(xhr, textStatus, exception) {
+                handleError(xhr, textStatus, exception);
+            }
+        });
     }
 
     $(document).ready(function () {

@@ -104,6 +104,32 @@ a.article:hover {
     padding-bottom: 2.5rem;
 }
 
+.actions {
+    margin-bottom: 16px;
+    height: 32px;
+}
+
+#refresh_actions {
+    display: inline;
+}
+
+#refresh_button {
+    float: left;
+}
+
+#refresh_img {
+    float: left;
+    display: none;
+    padding-left: 8px;
+    width: 42px;
+}
+
+#refresh_status {
+    float: left;
+    display: none;
+    padding-left: 8px;
+}
+
 /* ---------------------------------------------------
     FOOTER STYLE
 ----------------------------------------------------- */

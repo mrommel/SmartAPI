@@ -90,7 +90,7 @@ class CheckContent:
 		host = 'https://api.dailymotion.com'
 		field = 'id,title,duration'
 		language = 'de'
-		return f'{host}/videos?fields={field}&search={self.query}&limit=50&languages={language}' \
+		return f'{host}/videos?fields={field}&search={self.query}&limit=100&languages={language}' \
 		       f'&longer_than={self.min_duration}&sort=recent'
 
 
@@ -127,6 +127,13 @@ class CheckTaskState:
 			CheckContent(query='tng', min_duration=40),
 			CheckContent(query='%22next%20generation%22', min_duration=40),
 			CheckContent(query='picard', min_duration=30),
+			CheckContent(query='hawkeye', min_duration=30),
+			CheckContent(query='wandavision', min_duration=30),
+			CheckContent(query='loki', min_duration=30),
+			CheckContent(query='%22Agent%20carter%22', min_duration=30),
+			CheckContent(query='mandalorian', min_duration=30),
+			CheckContent(query='obi-wan', min_duration=30),
+			CheckContent(query='%22babylon%20berlin%22', min_duration=30),
 		]
 		self.current_index = len(self.checks)
 
@@ -150,20 +157,20 @@ class CheckTaskState:
 
 		db.commit()
 
-		time.sleep(2)
+		time.sleep(1)
 
 	def check_background_work(self, db: Session):
 		self.current_index = 0
 		for check in self.checks:
 			self._check_url(check.url(), db)
 			self.current_index += 1
-		print('checked all {len(self.checks)} items')
+		print(f'checked all {len(self.checks)} items')
 
 	def get_state(self):
 		status = 'ready'
 
-		if self.current_index < len(self.urls):
-			status = 'running ({self.current_index} / {len(self.urls)})'
+		if self.current_index < len(self.checks):
+			status = f'running ({self.current_index} / {len(self.checks)})'
 
 		return {'status': status}
 

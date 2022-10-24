@@ -68,3 +68,10 @@ class CheckResponse(BaseModel):
 
 	class Config:
 		arbitrary_types_allowed = True
+
+
+class ExistingVideoSchema(BaseModel):
+	"""
+		schema for existing video
+	"""
+	video_id: str

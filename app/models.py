@@ -83,6 +83,15 @@ class ActionChoices(enum.Enum):
 		return [c.value for c in ActionChoices]
 
 
+class PlatformChoices(enum.Enum):
+	"""
+		enum that contains action choices
+	"""
+	DAILYMOTION = 'Dailymotion'
+	VK = 'VK'
+	YOUTUBE = 'Youtube'
+
+
 class Video(Base):
 	"""
 		model of a video (maps to db class)
@@ -90,11 +99,13 @@ class Video(Base):
 	__tablename__ = 'videos'
 	id = Column(GUID(), primary_key=True, nullable=False, default=uuid.uuid4)
 	video_id = Column(String, unique=True, nullable=False)
-	title = Column(String, unique=True, nullable=False)
+	title = Column(String, nullable=False)
 	duration = Column(Integer, nullable=False)
-
 	action = Column(Enum(ActionChoices, values_callable=lambda x: [str(member.value) for member in ActionChoices]),
 	                server_default='Pending')
+	platform = Column(
+		Enum(PlatformChoices, values_callable=lambda x: [str(member.value) for member in PlatformChoices]),
+		server_default='Dailymotion')
 
 	created_at = Column(DateTime, default=func.current_timestamp())
 	updated_at = Column(DateTime, default=func.current_timestamp(), onupdate=func.current_timestamp())
