@@ -19,6 +19,9 @@ passlib[bcrypt]==1.7.4
 fastapi-jwt-auth[asymmetric]==0.5.0
 alembic==1.8.1
 python-multipart
+google-auth-httplib2
+google-api-python-client
+google-auth-oauthlib
 
 # website
 jinja2==3.1.2

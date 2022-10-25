@@ -21,6 +21,8 @@ class Settings(BaseSettings):
 
 	CLIENT_ORIGIN: str
 
+	GOOGLE_API_KEY: str
+
 	class Config:
 		"""
 			locale configuration
