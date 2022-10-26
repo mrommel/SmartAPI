@@ -7,8 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from starlette.requests import Request
-from starlette.responses import JSONResponse, PlainTextResponse
-from starlette.status import HTTP_404_NOT_FOUND
+from starlette.responses import JSONResponse
 
 from app.config import settings
 from app.routers import user, auth, check
@@ -106,11 +105,20 @@ def root():
 
 
 @app.exception_handler(HTTPException)
-async def http_exception_handler(request, exc):
-	return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
+async def http_exception_handler(_request, exc):
+	"""
+		generic exception handler
 
-
-
+		:param _request: request
+		:param exc: exception
+		:return: JSONResponse with the error
+	"""
+	return JSONResponse(
+		status_code=exc.status_code,
+		content={
+			"detail": exc.detail
+		}
+	)
 
 
 @app.exception_handler(AuthJWTException)
@@ -119,9 +127,11 @@ def authjwt_exception_handler(exc: AuthJWTException):
 		jwt error page
 
 		:param exc: exception
-		:return: HTMLResponse
+		:return: JSONResponse with the error
 	"""
 	return JSONResponse(
 		status_code=exc.status_code,
-		content={"detail": exc.message}
+		content={
+			"detail": exc.message
+		}
 	)

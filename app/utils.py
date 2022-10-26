@@ -2,7 +2,6 @@
 import os
 # -*- coding: utf-8 -*-
 import time
-import urllib
 import uuid
 from urllib.parse import urlencode, quote_plus
 
@@ -12,7 +11,6 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
 from passlib.context import CryptContext
 from sqlalchemy import TypeDecorator, CHAR
 from sqlalchemy.dialects.postgresql import UUID
@@ -83,21 +81,33 @@ class GUID(TypeDecorator):
 		return value
 
 	def process_literal_param(self, value, dialect):
-		"""Receive a literal parameter value to be rendered inline within
-		a statement."""
+		"""
+			Receive a literal parameter value to be rendered inline within
+			a statement.
+		"""
 
 	@property
 	def python_type(self):
-		"""Return the Python type object expected to be returned
-		by instances of this type, if known."""
+		"""
+			Return the Python type object expected to be returned
+			by instances of this type, if known.
+		"""
 
 
 class CheckContent:
+	"""
+		class that encapsulates data to be checked on different platforms
+	"""
 	def __init__(self, query: str, min_duration: int):
 		self.query = query
 		self.min_duration = min_duration
 
 	def dailymotion_url(self) -> str:
+		"""
+			get the dailymotion video url
+
+			:return: dailymotion video url
+		"""
 		host = 'https://api.dailymotion.com'
 		field = 'id,title,duration'
 		language = 'de'
@@ -113,18 +123,47 @@ class CheckContent:
 		return f'{host}/videos?{query_str}'
 
 
-class DailymotionVideoItem(object):
+class DailymotionVideoItem:
+	"""
+		class that represents a dailymotion video idem
+	"""
+
 	def __init__(self, id: str, title: str, duration: int):
+		"""
+			constructs a dailymotion video item
+
+			:param id: id of video
+			:param title: title of video
+			:param duration: duration of video
+		"""
 		self.video_id = id
 		self.title = title
 		self.duration = duration
 
 	def __repr__(self):
+		"""
+			get the string representation of dailymotion video item
+
+			:return: string representation of dailymotion video item
+		"""
 		return f'<video id={self.video_id}, title="{self.title}", duration={self.duration}>'
 
 
-class DailymotionVideoList(object):
+class DailymotionVideoList:
+	"""
+		class that encapsulates a dailymotion video list
+	"""
+
 	def __init__(self, page: int, limit: int, explicit, total, has_more, list: [DailymotionVideoItem]):
+		"""
+
+			:param page: current page
+			:param limit: limit
+			:param explicit: yes / no
+			:param total: total number of results
+			:param has_more: are there more results
+			:param list: list of videos
+		"""
 		self.page = page
 		self.limit = limit
 		self.explicit = explicit
@@ -133,41 +172,111 @@ class DailymotionVideoList(object):
 		self.videos = list
 
 	def __repr__(self):
+		"""
+			get a string representation of this dailymotion video list
+
+			:return: string representation of this dailymotion video list
+		"""
 		return f'<dm videolist({self.total}) = [{self.videos}]>'
 
 
-class YoutubePageInfo(object):
+class YoutubePageInfo:
+	"""
+		class that encapsulates a youtube page info
+	"""
+
 	def __init__(self, totalResults: int, resultsPerPage: int):
+		"""
+			constructor for a youtube page info
+
+			:param totalResults: total results
+			:param resultsPerPage: results per page
+		"""
 		self.totalResults = totalResults
 		self.resultsPerPage = resultsPerPage
 
 
-class YoutubeVideoId(object):
+class YoutubeVideoId:
+	"""
+		class representation of youtube video id
+	"""
 	def __init__(self, kind: str, videoId: str):
+		"""
+			constructs a youtube video id
+
+			:param kind: kind is a youtube video id
+			:param videoId: youtube video id
+		"""
 		self.kind = kind
 		self.videoId = videoId
 
 
-class YoutubeSnippet(object):
+class YoutubeSnippet:
+	"""
+		class that represents youtube video data
+	"""
+
 	def __init__(self, title: str, description: str):
+		"""
+			constructor of youtube video data
+
+			:param title: title of the video
+			:param description: description of the video
+		"""
 		self.title = title
 		self.description = description
 
 	def __repr__(self):
+		"""
+			get string representation of a youtube video data
+
+			:return: string representation of a youtube video data
+		"""
 		return f'<yt video snippet({self.title})>'
 
 
-class YoutubeContentDetails(object):
+class YoutubeContentDetails:
+	"""
+		class represents youtube video content details
+	"""
 	def __init__(self, duration: str):
+		"""
+			constructor of youtube content details
+
+			:param duration: duration in youtube duration representation
+		"""
 		self.duration = duration
 
 	def __repr__(self):
+		"""
+			get string representation of youtube duration representation
+
+			:return: string representation of youtube duration representation
+		"""
 		return f'<yt video content duration={self.duration}>'
 
 
-class YoutubeVideoItem(object):
-	def __init__(self, kind: str, etag: str, id: YoutubeVideoId, snippet: YoutubeSnippet,
-	             contentDetails: YoutubeContentDetails = None):
+class YoutubeVideoItem:
+	"""
+		class that represents a youtube video
+	"""
+	def __init__(
+		self,
+		kind: str,
+		etag: str,
+		id: YoutubeVideoId,
+		snippet: YoutubeSnippet,
+	    contentDetails: YoutubeContentDetails = None
+	):
+		"""
+			constructor of a youtube video
+
+			:param kind: kind (it is a video)
+			:param etag: etag of video
+			:param id: struct with video id
+			:param snippet: additional data
+			:param contentDetails: additional video data
+		"""
 		self.kind = kind
 		self.etag = etag
 		self.id = id
@@ -182,12 +291,23 @@ class YoutubeVideoItem(object):
 		return f'<yt video: title={self.snippet.title}, duration={duration}>'
 
 
-class YoutubeVideoList(object):
-	def __init__(self, kind: str, etag: str, nextPageToken: str = '', regionCode: str = '',
-	             pageInfo: YoutubePageInfo = None, items: [YoutubeVideoItem] = []):
+class YoutubeVideoList:
+	"""
+		class that represents a youtube video list
+	"""
+	def __init__(
+		self,
+		kind: str,
+		etag: str,
+		nextPageToken: str = '',
+		regionCode: str = '',
+	    pageInfo: YoutubePageInfo = None,
+		items: [YoutubeVideoItem] = None
+	):
 		"""
 			build YouTube video list
 
+			:type pageInfo: page info
 			:type nextPageToken: token of next page
 		"""
 		self.kind = kind
@@ -195,13 +315,23 @@ class YoutubeVideoList(object):
 		self.nextPageToken = nextPageToken
 		self.regionCode = regionCode
 		self.pageInfo = pageInfo
-		self.videos = items
+
+		if items is None:
+			self.videos = []
+		else:
+			self.videos = items
 
 	def __repr__(self):
 		return f'<yt videolist({len(self.videos)}) = [{self.videos}]>'
 
 
-def convert_youtube_duration_to_seconds(duration):
+def convert_youtube_duration_to_seconds(duration) -> int:
+	"""
+		convert the string representation of a youtube string to seconds
+
+		:param duration: duration in youtube string representation
+		:return: youtube string in seconds
+	"""
 	day_time = duration.split('T')
 	day_duration = day_time[0].replace('P', '')
 	day_list = day_duration.split('D')
@@ -234,6 +364,9 @@ def convert_youtube_duration_to_seconds(duration):
 
 
 class CheckTaskState:
+	"""
+		class that represents the complete data of a check request
+	"""
 
 	def __init__(self):
 		self.checks = [
@@ -260,7 +393,7 @@ class CheckTaskState:
 			:param url: video url to check
 			:param db: database
 		"""
-		response = requests.get(url.dailymotion_url())
+		response = requests.get(url.dailymotion_url(), timeout=10)
 		video_list = DailymotionVideoList(**response.json())
 
 		for video in video_list.videos:
@@ -269,12 +402,14 @@ class CheckTaskState:
 			if existing_video:
 				continue
 
-			payload = dict()
-			payload['video_id'] = video['id']
-			payload['title'] = video['title']
-			payload['duration'] = video['duration']
-			payload['action'] = 'Pending'  # cannot import ActionChoices (circular import)
-			payload['platform'] = 'Dailymotion'
+			payload = {
+				'video_id': video['id'],
+				'title': video['title'],
+				'duration': video['duration'],
+				'action': 'Pending',  # cannot import ActionChoices (circular import)
+				'platform': 'Dailymotion'
+			}
+
 			new_video = models.Video(**payload)
 			db.add(new_video)
 
@@ -312,7 +447,7 @@ class CheckTaskState:
 				creds = flow.run_local_server(port=0)
 
 			# Save the credentials for the next run
-			with open('token.json', 'w') as token:
+			with open('token.json', 'w', encoding="utf-8") as token:
 				token.write(creds.to_json())
 
 		return build(api_service_name, api_version, credentials=creds, developerKey=settings.GOOGLE_API_KEY)
@@ -351,30 +486,32 @@ class CheckTaskState:
 				return
 
 			video_ids = ','.join(video_list_details)
-			print(f'try to fetch more info for: {video_ids}')
+			# print(f'try to fetch more info for: {video_ids}')
 
 			# fetch duration for these videos
-			details_request = youtube_service.videos().list(
+			request = youtube_service.videos().list(
 				part="snippet,contentDetails",
 				id=video_ids
 			)
 
-			details_response = details_request.execute()
-			details_video_list = YoutubeVideoList(**details_response)
-			print(details_video_list)
+			response = request.execute()
+			video_list = YoutubeVideoList(**response)
+			# print(details_video_list)
 
-			for details_video in details_video_list.videos:
-				# print(details_video['contentDetails']['duration'])
-				# print(details_video)
-				duration = convert_youtube_duration_to_seconds(details_video['contentDetails']['duration'])
-				# print(f"duration of {details_video['id']} / {details_video['snippet']['title']}: {duration}")
+			for video in video_list.videos:
+				# print(video['contentDetails']['duration'])
+				# print(video)
+				duration = convert_youtube_duration_to_seconds(video['contentDetails']['duration'])
+				# print(f"duration of {video['id']} / {video['snippet']['title']}: {duration}")
 
-				payload = dict()
-				payload['video_id'] = details_video['id']
-				payload['title'] = details_video['snippet']['title']
-				payload['duration'] = duration
-				payload['action'] = 'Pending'  # cannot import ActionChoices (circular import)
-				payload['platform'] = 'Youtube'  # cannot import PlatformChoices (circular import)
+				payload = {
+					'video_id': video['id'],
+					'title': video['snippet']['title'],
+					'duration': duration,
+					'action': 'Pending',  # cannot import ActionChoices (circular import)
+					'platform': 'Youtube'  # cannot import PlatformChoices (circular import)
+				}
+
 				new_video = models.Video(**payload)
 				db.add(new_video)
 
@@ -386,6 +523,12 @@ class CheckTaskState:
 			print(f'An error occurred: {error}')
 
 	def check_background_work(self, db: Session):
+		"""
+			starts the check of dailymotion and youtube
+
+			:param db: database
+			:return: Nothing
+		"""
 		self.current_index = 0
 		for check in self.checks:
 			self._check_dailymotion_url(check, db)
@@ -394,6 +537,11 @@ class CheckTaskState:
 		print(f'checked all {len(self.checks)} items')
 
 	def get_state(self):
+		"""
+			get the state of the current background thread
+
+			:return: state of the current background thread
+		"""
 		status = 'ready'
 
 		if self.current_index < len(self.checks):

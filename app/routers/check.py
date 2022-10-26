@@ -1,3 +1,4 @@
+"""auth module"""
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette.background import BackgroundTasks
@@ -23,11 +24,23 @@ async def start_check(background_tasks: BackgroundTasks, db: Session = Depends(g
 
 @router.get("/status")
 def status():
+	"""
+		get the status of the background service to download videos
+
+		:return: status of the background service to download videos
+	"""
 	return check_state.get_state()
 
 
 @router.get("/checks", response_model=schemas.CheckResponse)
-def checks(db: Session = Depends(get_db), user_id: str = Depends(oauth2.require_user)):
+def checks(db: Session = Depends(get_db), _user_id: str = Depends(oauth2.require_user)):
+	"""
+		returns the list of videos to be checked (aka status pending)
+
+		:param db: database - injected
+		:param _user_id: user id (user must logged in) - injected
+		:return: list of videos
+	"""
 	videos = db.query(models.Video).filter(models.Video.action == 'Pending').all()
 
 	response_videos = []
@@ -42,7 +55,10 @@ def checks(db: Session = Depends(get_db), user_id: str = Depends(oauth2.require_
 
 
 @router.post('/ignore')
-def ignore_video(payload: schemas.ExistingVideoSchema = Depends(schemas.ExistingVideoSchema), db: Session = Depends(get_db)):
+def ignore_video(
+	payload: schemas.ExistingVideoSchema = Depends(schemas.ExistingVideoSchema),
+	db: Session = Depends(get_db)
+):
 	"""
 		end-point to ignore an existing video
 

@@ -2,8 +2,7 @@
 import enum
 import uuid
 
-from sqlalchemy import Column, String, Boolean, DateTime, func, Enum, Integer, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, Boolean, DateTime, func, Enum, Integer
 
 from .database import Base
 from .utils import GUID

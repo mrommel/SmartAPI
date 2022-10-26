@@ -157,6 +157,7 @@ def test_login_valid_username_and_wrong_password():
 		json={"username": "sample@abc.de", "password": "weakpassword"},
 	)
 
+	print(response.json())
 	assert response.status_code == 400
 	assert response.json() == {
 		'detail': 'Incorrect Email or Password',
