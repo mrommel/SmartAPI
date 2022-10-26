@@ -42,19 +42,19 @@ def checks(db: Session = Depends(get_db), user_id: str = Depends(oauth2.require_
 
 
 @router.post('/ignore')
-def ignore_video(payload: schemas.ExistingVideoSchema, db: Session = Depends(get_db)):
+def ignore_video(payload: schemas.ExistingVideoSchema = Depends(schemas.ExistingVideoSchema), db: Session = Depends(get_db)):
 	"""
 		end-point to ignore an existing video
 
 		:return: Nothing
 	"""
 	# Check if user already exist
-	existing_video = db.query(models.Video).filter(models.Video.video_id == payload.video_id.lower()).first()
+	existing_video = db.query(models.Video).filter(models.Video.video_id == payload.video_id).first()
 	if existing_video is None:
-		raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail='Video does not exist')
+		raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=f'Video with id {payload.video_id} does not exist')
 
 	existing_video.action = ActionChoices.IGNORE.value
 	db.add(existing_video)
 	db.commit()
 
-	return {}
+	return {'result': 'success'}

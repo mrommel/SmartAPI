@@ -186,7 +186,7 @@ class YoutubeVideoList(object):
 	def __init__(self, kind: str, etag: str, nextPageToken: str = '', regionCode: str = '',
 	             pageInfo: YoutubePageInfo = None, items: [YoutubeVideoItem] = []):
 		"""
-			build youtube video list
+			build YouTube video list
 
 			:type nextPageToken: token of next page
 		"""
@@ -336,31 +336,45 @@ class CheckTaskState:
 			video_list = YoutubeVideoList(**response)
 			# print(video_list)
 
+			video_list_details = []
+
 			for video in video_list.videos:
 				existing_video = db.query(models.Video).filter(models.Video.video_id == video['id']['videoId']).first()
 
 				if existing_video:
 					continue
 
-				# fetch duration
-				detail_request = youtube_service.videos().list(
-					part="snippet,contentDetails",
-					id=video['id']['videoId']
-				)
-				detail_response = detail_request.execute()
-				detail_video_list = YoutubeVideoList(**detail_response)
-				print(detail_video_list)
-				print(detail_video_list['items'][0]['contentDetails']['duration'])
-				duration = convert_youtube_duration_to_seconds(
-					detail_video_list['items'][0]['contentDetails']['duration'])
-				time.sleep(1)
+				video_list_details.append(video['id']['videoId'])
+
+			if len(video_list_details) == 0:
+				print('no videos to fetch details for')
+				return
+
+			video_ids = ','.join(video_list_details)
+			print(f'try to fetch more info for: {video_ids}')
+
+			# fetch duration for these videos
+			details_request = youtube_service.videos().list(
+				part="snippet,contentDetails",
+				id=video_ids
+			)
+
+			details_response = details_request.execute()
+			details_video_list = YoutubeVideoList(**details_response)
+			print(details_video_list)
+
+			for details_video in details_video_list.videos:
+				# print(details_video['contentDetails']['duration'])
+				# print(details_video)
+				duration = convert_youtube_duration_to_seconds(details_video['contentDetails']['duration'])
+				# print(f"duration of {details_video['id']} / {details_video['snippet']['title']}: {duration}")
 
 				payload = dict()
-				payload['video_id'] = video['id']['videoId']
-				payload['title'] = video['snippet']['title']
+				payload['video_id'] = details_video['id']
+				payload['title'] = details_video['snippet']['title']
 				payload['duration'] = duration
 				payload['action'] = 'Pending'  # cannot import ActionChoices (circular import)
-				payload['platform'] = 'Youtube'  # cannot import ActionChoices (circular import)
+				payload['platform'] = 'Youtube'  # cannot import PlatformChoices (circular import)
 				new_video = models.Video(**payload)
 				db.add(new_video)
 

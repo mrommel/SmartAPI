@@ -1,13 +1,14 @@
 """main module"""
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, PlainTextResponse
+from starlette.status import HTTP_404_NOT_FOUND
 
 from app.config import settings
 from app.routers import user, auth, check
@@ -104,44 +105,12 @@ def root():
 	return {'message': 'Hello World'}
 
 
-@app.exception_handler(404)
-async def custom_404_handler(request, __):
-	"""
-		404 error page
-
-		:param request: request
-		:param __: empty
-		:return: HTMLResponse
-	"""
-	content = {
-		"request": request,
-		"error_title": "404 Not Found",
-		"error_description": "The server can not find the requested resource. In the browser, this means the URL is "
-		                     "not recognized. In an API, this can also mean that the endpoint is valid but the "
-		                     "resource itself does not exist. Servers may also send this response instead of 403 "
-		                     "Forbidden to hide the existence of a resource from an unauthorized client. This response "
-		                     "code is probably the most well known due to its frequent occurrence on the web.",
-		"data": {}
-	}
-	return templates.TemplateResponse("error.html", content)
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+	return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
 
 
-@app.exception_handler(500)
-async def custom_500_handler(request, __):
-	"""
-		handle 500 error
 
-		:param request: requesr
-		:param __: empty
-		:return: HTMLResponse
-	"""
-	content = {
-		"request": request,
-		"error_title": "500 Internal Server Error",
-		"error_description": "The server has encountered a situation it does not know how to handle.",
-		"data": {}
-	}
-	return templates.TemplateResponse("error.html", content)
 
 
 @app.exception_handler(AuthJWTException)
