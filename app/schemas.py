@@ -3,8 +3,7 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from fastapi import Form
-from pydantic import BaseModel, EmailStr, constr
+from pydantic import BaseModel, EmailStr, constr, Field
 
 from app.models import RoleChoices, GenderChoices
 
@@ -73,3 +72,10 @@ class CheckResponse(BaseModel):
 			config class
 		"""
 		arbitrary_types_allowed = True
+
+
+class VersionResponse(BaseModel):
+	"""
+		class that represents a version
+	"""
+	version: str = Field(..., title='Version Information', description='Version Information')

@@ -1,18 +1,20 @@
 """main module"""
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi_jwt_auth.exceptions import AuthJWTException
 from starlette.requests import Request
-from starlette.responses import JSONResponse
 
 from app.config import settings
+from app.exceptions import init_exception
 from app.routers import user, auth, check
+from app.schemas import VersionResponse
 
-app = FastAPI()
+_version='1.0.0'
+
+app = FastAPI(version=_version)
 
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -37,11 +39,11 @@ app.include_router(check.router, tags=['Checks'], prefix='/api/checks')
 @app.get("/", tags=['Website'], response_class=HTMLResponse)
 async def home(request: Request):
 	"""
-		home page
+        home page
 
-		:param request: request
-		:return:
-	"""
+        :param request: request
+        :return:
+    """
 	logged_in = False
 	if 'logged_in' in request.cookies:
 		logged_in = bool(request.cookies['logged_in'])
@@ -57,11 +59,11 @@ async def home(request: Request):
 @app.get('/profile', tags=['Website'], response_class=HTMLResponse)
 def profile(request: Request):
 	"""
-		profile page
+        profile page
 
-		:param request: request
-		:return:
-	"""
+        :param request: request
+        :return:
+    """
 	logged_in = False
 	if 'logged_in' in request.cookies:
 		logged_in = bool(request.cookies['logged_in'])
@@ -77,11 +79,11 @@ def profile(request: Request):
 @app.get('/checks', tags=['Website'], response_class=HTMLResponse)
 def checks(request: Request):
 	"""
-		checks page
+        checks page
 
-		:param request: request
-		:return:
-	"""
+        :param request: request
+        :return:
+    """
 	logged_in = False
 	if 'logged_in' in request.cookies:
 		logged_in = bool(request.cookies['logged_in'])
@@ -94,44 +96,22 @@ def checks(request: Request):
 	return templates.TemplateResponse("checks.html", {"request": request, "data": data})
 
 
-@app.get('/api/healthchecker', tags=['Health'])
+@app.get('/api/healthchecker', tags=['Core'])
 def root():
 	"""
-		sample end-point
+        sample end-point
 
-		:return: 'hello world'
-	"""
+        :return: 'hello world'
+    """
 	return {'message': 'Hello World'}
 
 
-@app.exception_handler(HTTPException)
-async def http_exception_handler(_request, exc):
-	"""
-		generic exception handler
-
-		:param _request: request
-		:param exc: exception
-		:return: JSONResponse with the error
-	"""
-	return JSONResponse(
-		status_code=exc.status_code,
-		content={
-			"detail": exc.detail
-		}
-	)
+@app.get("/api/version", tags=['Core'], summary='Get system version number', response_model=VersionResponse)
+async def version_api():
+	"""Get system version number"""
+	return {"version": _version}
 
 
-@app.exception_handler(AuthJWTException)
-def authjwt_exception_handler(exc: AuthJWTException):
-	"""
-		jwt error page
+# *****************************************************
 
-		:param exc: exception
-		:return: JSONResponse with the error
-	"""
-	return JSONResponse(
-		status_code=exc.status_code,
-		content={
-			"detail": exc.message
-		}
-	)
+init_exception(app)

@@ -119,6 +119,66 @@ def test_health():
 	assert response.status_code == 200
 
 
+def test_cant_create_user_twice(valid_access_token):
+	"""
+		check if a user with the same username cant be created twice
+
+		:param valid_access_token:
+		:return:
+	"""
+	signup_response = client.post(
+		"/api/auth/signup",
+		json={
+			"name": "string",
+			"email": "sample@abc.de",
+			"photo": "abc.jpg",
+			"password": "secret234",
+			"passwordConfirm": "secret234",
+			"role": "User",
+			"gender": "Male",
+			"verified": "true"
+		},
+	)
+
+	# print(signup_response.json())
+	assert signup_response.status_code == 409
+	assert signup_response.json() == {
+		'code': 409,
+		'message': 'Account already exist',
+		'detail': 'Account already exist'
+	}
+
+
+def test_cant_create_user_password_mismatch(valid_access_token):
+	"""
+		check if a user with different password cant be created
+
+		:param valid_access_token:
+		:return:
+	"""
+	signup_response = client.post(
+		"/api/auth/signup",
+		json={
+			"name": "string",
+			"email": "sample2@abc.de", # different user
+			"photo": "abc.jpg",
+			"password": "secret234",
+			"passwordConfirm": "secret1234", # mismatch
+			"role": "User",
+			"gender": "Male",
+			"verified": "true"
+		},
+	)
+
+	# print(signup_response.json())
+	assert signup_response.status_code == 400
+	assert signup_response.json() == {
+		'code': 400,
+		'message': 'Passwords do not match',
+		'detail': 'Passwords do not match'
+	}
+
+
 def test_login_successfully(valid_access_token):
 	"""
 		test if access token is valid
@@ -142,7 +202,9 @@ def test_login_wrong_username_and_password():
 
 	assert response.status_code == 400
 	assert response.json() == {
+		'code': 400,
 		'detail': 'Incorrect Email or Password',
+		'message': 'Incorrect Email or Password'
 	}
 
 
@@ -157,10 +219,12 @@ def test_login_valid_username_and_wrong_password():
 		json={"username": "sample@abc.de", "password": "weakpassword"},
 	)
 
-	print(response.json())
+	# print(response.json())
 	assert response.status_code == 400
 	assert response.json() == {
+		'code': 400,
 		'detail': 'Incorrect Email or Password',
+		'message': 'Incorrect Email or Password'
 	}
 
 
@@ -207,7 +271,11 @@ def test_user_profile_invalid_token():
 	)
 
 	assert response.status_code == 401
-	assert response.json() == {'detail': 'Token is invalid or has expired'}
+	assert response.json() == {
+		'code': 401,
+		'detail': 'Token is invalid or has expired',
+		'message': 'Token is invalid or has expired'
+	}
 
 
 def test_user_profile_empty_token():
@@ -227,7 +295,11 @@ def test_user_profile_empty_token():
 	)
 
 	assert response.status_code == 401
-	assert response.json() == {'detail': 'You are not logged in'}
+	assert response.json() == {
+		'code': 401,
+		'detail': 'You are not logged in',
+		'message': 'You are not logged in'
+	}
 
 
 def test_user_profile_no_token():
@@ -248,4 +320,8 @@ def test_user_profile_no_token():
 	)
 
 	assert response.status_code == 401
-	assert response.json() == {'detail': 'You are not logged in'}
+	assert response.json() == {
+		'code': 401,
+		'detail': 'You are not logged in',
+		'message': 'You are not logged in'
+	}

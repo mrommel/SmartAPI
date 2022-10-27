@@ -102,16 +102,16 @@ def login(payload: schemas.LoginUserSchema, response: Response, db: Session = De
 def refresh_token(response: Response, request: Request, authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
 	"""
 
+		:param authorize:
 		:param response:
 		:param request:
-		:param Authorize:
 		:param db:
 		:return:
 	"""
 	try:
 		authorize.jwt_refresh_token_required()
 
-		print(request.scope)
+		request.scope = 'abc'
 
 		user_id = authorize.get_jwt_subject()
 		if not user_id:
@@ -149,6 +149,6 @@ def logout(response: Response, authorize: AuthJWT = Depends(), user_id: str = De
 	"""
 	authorize.unset_jwt_cookies()
 	response.set_cookie('logged_in', '', -1)
-	print(user_id)  # to prevent warning
+	_ = '' + user_id  # to prevent warning
 
 	return {'status': 'success'}
