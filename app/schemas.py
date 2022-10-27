@@ -57,6 +57,7 @@ class VideoResponse(BaseModel):
 		video check schema
 	"""
 	video_id: str
+	platform: str
 	title: str
 	duration: int
 
@@ -72,19 +73,3 @@ class CheckResponse(BaseModel):
 			config class
 		"""
 		arbitrary_types_allowed = True
-
-
-class ExistingVideoSchema:
-	"""
-		schema for existing video
-	"""
-
-	def __init__(
-		self,
-		video_id: str = Form(
-            ...,
-            title="video id",
-            description="video id of dailymotion or youtube video",
-            example="adasfbgjhsdf"),
-	):
-		self.video_id = video_id

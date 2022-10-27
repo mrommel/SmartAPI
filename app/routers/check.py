@@ -1,5 +1,5 @@
 """auth module"""
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
 from starlette.background import BackgroundTasks
 from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
@@ -46,7 +46,12 @@ def checks(db: Session = Depends(get_db), _user_id: str = Depends(oauth2.require
 	response_videos = []
 
 	for video in videos:
-		response_video = VideoResponse(video_id=video.video_id, title=video.title, duration=video.duration)
+		response_video = VideoResponse(
+			video_id=video.video_id,
+			platform=video.platform.value,
+			title=video.title,
+			duration=video.duration
+		)
 		response_videos.append(response_video)
 
 	response_schema = schemas.CheckResponse()
@@ -56,18 +61,19 @@ def checks(db: Session = Depends(get_db), _user_id: str = Depends(oauth2.require
 
 @router.post('/ignore')
 def ignore_video(
-	payload: schemas.ExistingVideoSchema = Depends(schemas.ExistingVideoSchema),
+	video_id: str = Body(embed=True, description="video id of dailymotion or youtube video"),
 	db: Session = Depends(get_db)
 ):
 	"""
 		end-point to ignore an existing video
 
+		:param video_id: identifier of a dailymotion or youtube video
 		:return: Nothing
 	"""
 	# Check if user already exist
-	existing_video = db.query(models.Video).filter(models.Video.video_id == payload.video_id).first()
+	existing_video = db.query(models.Video).filter(models.Video.video_id == video_id).first()
 	if existing_video is None:
-		raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=f'Video with id {payload.video_id} does not exist')
+		raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=f'Video with id {video_id} does not exist')
 
 	existing_video.action = ActionChoices.IGNORE.value
 	db.add(existing_video)

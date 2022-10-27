@@ -3,6 +3,7 @@ import enum
 import uuid
 
 from sqlalchemy import Column, String, Boolean, DateTime, func, Enum, Integer, TypeDecorator, CHAR
+from sqlalchemy.dialects.postgresql import UUID
 
 from .database import Base
 
@@ -18,7 +19,7 @@ class GUID(TypeDecorator):
 
 	def load_dialect_impl(self, dialect):
 		if dialect.name == 'postgresql':
-			return dialect.type_descriptor(uuid.UUID())
+			return dialect.type_descriptor(UUID())
 
 		return dialect.type_descriptor(CHAR(32))
 

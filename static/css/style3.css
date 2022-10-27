@@ -107,10 +107,12 @@ a.article:hover {
 .actions {
     margin-bottom: 16px;
     height: 32px;
+    display: flex;
+    justify-content: space-between;
 }
 
 #refresh_actions {
-    display: inline;
+
 }
 
 #refresh_button {
@@ -130,6 +132,14 @@ a.article:hover {
     display: none;
     padding-left: 8px;
     padding-top: 5px;
+}
+
+.video_actions {
+    width: 120px;
+}
+
+.video_icon {
+    width: 32px;
 }
 
 /* ---------------------------------------------------
