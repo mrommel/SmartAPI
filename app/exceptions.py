@@ -167,7 +167,7 @@ def init_exception(app: FastAPI):
 		"""
 		_ = request  # prevent warning
 		_ = exc  # prevent warning
-		_ = format_exc()
+		msg = format_exc()
 		# print(msg, flush=True)
 		return ErrorResponse(HTTP_500_INTERNAL_SERVER_ERROR, message='inner exception', detail=get_detail(msg))
 
@@ -178,7 +178,7 @@ def init_exception(app: FastAPI):
 		"""
 		_ = request  # prevent warning
 		_ = exc  # prevent warning
-		_ = format_exc()
+		msg = format_exc()
 		# print(msg, flush=True)
 		return ErrorResponse(HTTP_500_INTERNAL_SERVER_ERROR, message='inner exception', detail=get_detail(msg))
 
@@ -189,6 +189,6 @@ def init_exception(app: FastAPI):
 		"""
 		_ = request  # prevent warning
 		_ = exc  # prevent warning
-		_ = format_exc()
+		msg = format_exc()
 		# print(msg, flush=True)
 		return ErrorResponse(HTTP_500_INTERNAL_SERVER_ERROR, message='inner exception', detail=get_detail(msg))
