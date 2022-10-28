@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app import oauth2
 from app.oauth2 import AuthJWT
+from .captcha import check_captcha_code
 from .. import schemas, models, utils
 from ..config import settings
 from ..database import get_db
@@ -33,9 +34,16 @@ async def create_user(payload: schemas.CreateUserSchema, db: Session = Depends(g
 	# Compare password and passwordConfirm
 	if payload.password != payload.passwordConfirm:
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Passwords do not match')
+	# check captcha
+	if not check_captcha_code(payload.captchaToken, payload.captchaCode, db):
+		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Captcha not valid')
 	#  Hash the password
 	payload.password = utils.hash_password(payload.password)
+	# remove some form keywords
 	del payload.passwordConfirm
+	del payload.captchaCode
+	del payload.captchaToken
+
 	payload.role = RoleChoices.USER.value
 	payload.gender = GenderChoices.MALE.value
 	payload.verified = True

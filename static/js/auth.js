@@ -9,17 +9,15 @@ function uuidv4() {
 function showSignupForm() {
     // init captcha
     var token = uuidv4();
-    console.log('token: ' + token);
-    // signup_captcha_image
     $('#signup_captcha_image').attr("src", '/api/captcha/' + token);
-    // signup_captcha_token
     $('#signup_captcha_token').attr('value', token);
 
-    // show
+    // show form
     $('#signup_form').show()
 }
 
 function showLoginForm() {
+    // show form
     $('#login_form').show()
 }
 
@@ -54,7 +52,9 @@ function handleSignupClicked() {
         name: $("#signup_name").val(),
         photo: 'default.png',
         password: $("#signup_password").val(),
-        passwordConfirm: $("#signup_repeat_password").val()
+        passwordConfirm: $("#signup_repeat_password").val(),
+        captchaCode: $("#signup_captcha_code").val(),
+        captchaToken: $("#signup_captcha_token").val()
     };
 
     $.ajax({

@@ -32,6 +32,8 @@ class CreateUserSchema(UserBaseSchema):
 	role: str = RoleChoices.USER.value
 	gender: str = GenderChoices.MALE.value
 	verified: bool = False
+	captchaCode: str
+	captchaToken: str
 
 
 class LoginUserSchema(BaseModel):
@@ -79,3 +81,10 @@ class VersionResponse(BaseModel):
 		class that represents a version
 	"""
 	version: str = Field(..., title='Version Information', description='Version Information')
+
+
+class CaptchaResponse(BaseModel):
+	"""
+		schema with captcha validation information
+	"""
+	valid: bool

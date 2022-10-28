@@ -23,7 +23,7 @@ router = APIRouter()
 
 # https://github.com/ibbd-dev/fastapi-start/tree/e84277e8d5af45d2f5dae19268ff3ed6721c71d6/app/project/captcha_module
 
-def _check_captcha_code(token: str, code: str, db: Session) -> bool:
+def check_captcha_code(token: str, code: str, db: Session) -> bool:
 	"""
 		Verify verification captcha code
 
@@ -39,7 +39,7 @@ def _check_captcha_code(token: str, code: str, db: Session) -> bool:
 		return False
 
 	# Verification code can only be used once
-	db.delete(token)
+	db.delete(captcha)
 
 	# if captcha.created + _captcha_valid < datetime.now:
 	#	# expired
@@ -47,7 +47,7 @@ def _check_captcha_code(token: str, code: str, db: Session) -> bool:
 
 	saved_code = captcha.code
 
-	saved_code = str(saved_code, encoding='utf8')
+	# saved_code = str(saved_code, encoding='utf8')
 	print(f'{saved_code} == {code}')
 	return saved_code == code
 
