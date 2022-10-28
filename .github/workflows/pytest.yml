@@ -34,10 +34,9 @@ jobs:
         pytest -q app/tests/test_api.py -q app/tests/test_utils.py
     - name: Coverage with pytest
       run: |
-        # pytest -q app/tests/test_api.py -q app/tests/test_utils.py --cov-report xml:coverage.xml
-        coverage run -m pytest -q app/tests/test_api.py -q app/tests/test_utils.py xml coverage.xml
+        coverage run -m pytest -q app/tests/test_api.py -q app/tests/test_utils.py
     - name: Get cover
       uses: orgoro/coverage@v3
       with:
-          coverageFile: ./coverage.xml
+          coverageFile: ./.coverage
           token: ${{ secrets.GITHUB_TOKEN }}
