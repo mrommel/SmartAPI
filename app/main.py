@@ -9,7 +9,7 @@ from starlette.requests import Request
 
 from app.config import settings
 from app.exceptions import init_exception
-from app.routers import user, auth, check
+from app.routers import user, auth, check, captcha
 from app.schemas import VersionResponse
 
 _version='1.0.0'
@@ -33,6 +33,7 @@ app.add_middleware(
 
 app.include_router(auth.router, tags=['Auth'], prefix='/api/auth')
 app.include_router(user.router, tags=['Users'], prefix='/api/users')
+app.include_router(captcha.router, tags=['Users'], prefix='/api/captcha')
 app.include_router(check.router, tags=['Checks'], prefix='/api/checks')
 
 

@@ -1,5 +1,28 @@
 /** assumes jquery is loaded **/
 
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+
+function showSignupForm() {
+    // init captcha
+    var token = uuidv4();
+    console.log('token: ' + token);
+    // signup_captcha_image
+    $('#signup_captcha_image').attr("src", '/api/captcha/' + token);
+    // signup_captcha_token
+    $('#signup_captcha_token').attr('value', token);
+
+    // show
+    $('#signup_form').show()
+}
+
+function showLoginForm() {
+    $('#login_form').show()
+}
+
 function handleLoginClicked() {
     var formData = {
         username: $("#login_email").val(),
@@ -14,7 +37,7 @@ function handleLoginClicked() {
         dataType: "json",
         success: function(response) {
             console.log('success: ' + JSON.stringify(response));
-            document.getElementById('login_form').style.display='none';
+            $('#login_form').hide()
             setTimeout(function() {
                 window.location.reload();
             }, 3);
@@ -42,7 +65,7 @@ function handleSignupClicked() {
         dataType: "json",
         success: function(response) {
             console.log('success: ' + JSON.stringify(response));
-            document.getElementById('signup_form').style.display='none';
+            $('#signup_form').hide()
             window.location.href = window.location.href;
         },
         error: function(xhr, textStatus, exception) {

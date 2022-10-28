@@ -159,3 +159,16 @@ class Video(Base):
 
 	created_at = Column(DateTime, default=func.current_timestamp())
 	updated_at = Column(DateTime, default=func.current_timestamp(), onupdate=func.current_timestamp())
+
+
+class Captcha(Base):
+	"""
+		model of a captcha entry
+	"""
+	__tablename__ = 'captcha'
+	id = Column(GUID(), primary_key=True, nullable=False, default=uuid.uuid4)
+	code = Column(String, nullable=False)
+	token = Column(String, nullable=False)
+
+	created_at = Column(DateTime, default=func.current_timestamp())
+	updated_at = Column(DateTime, default=func.current_timestamp(), onupdate=func.current_timestamp())

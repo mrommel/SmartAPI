@@ -50,7 +50,7 @@ async def create_user(payload: schemas.CreateUserSchema, db: Session = Depends(g
 # Login user
 @router.post('/login')
 def login(payload: schemas.LoginUserSchema, response: Response, db: Session = Depends(get_db),
-          authorize: AuthJWT = Depends()):
+			authorize: AuthJWT = Depends()):
 	"""
 		end-point to log in a user
 
@@ -72,7 +72,7 @@ def login(payload: schemas.LoginUserSchema, response: Response, db: Session = De
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
 		                    detail='Please verify your email address')
 
-	# Check if the password is valid
+	# Check if the password is valid - second param is the hashed pwd
 	if not utils.verify_password(payload.password, user.password):
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
 		                    detail='Incorrect Email or Password')
@@ -101,9 +101,10 @@ def login(payload: schemas.LoginUserSchema, response: Response, db: Session = De
 @router.get('/refresh')
 def refresh_token(response: Response, request: Request, authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
 	"""
+		refresh the access token with a valid access token
 
 		:param authorize:
-		:param response:
+		:param response: request
 		:param request:
 		:param db:
 		:return:
@@ -111,7 +112,7 @@ def refresh_token(response: Response, request: Request, authorize: AuthJWT = Dep
 	try:
 		authorize.jwt_refresh_token_required()
 
-		request.scope = 'abc'
+		_ = request
 
 		user_id = authorize.get_jwt_subject()
 		if not user_id:

@@ -145,19 +145,25 @@ def init_exception(app: FastAPI):
 	async def http_exception_handler(request, exc: HTTPException) -> ErrorResponse:
 		"""
 			Catch FastAPI exceptions
+
+			:param request: the request
+			:param exc: exception
+			:return: JSONResponse with the error
 		"""
 		_ = request  # prevent warning
 		# print(format_exc(), flush=True)
 		return ErrorResponse(exc.status_code, message=str(exc.detail), detail=exc.detail)
 
 	@app.exception_handler(AuthJWTException)
-	def authjwt_exception_handler(exc: AuthJWTException):
+	def authjwt_exception_handler(request, exc: AuthJWTException):
 		"""
 			jwt error page
 
+			:param request: the request
 			:param exc: exception
 			:return: JSONResponse with the error
 		"""
+		_ = request  # prevent warning
 		return ErrorResponse(exc.status_code, message=str(exc.message), detail=exc.detail)
 
 	@app.exception_handler(Exception)
