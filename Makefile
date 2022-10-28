@@ -15,10 +15,10 @@ pylint: venv
 	./$(VENV)/bin/pylint --disable=C0303,R0903,R0915,C0103,E1101,E0102,R0913,W0123,R0912,R0801,W0622 --extension-pkg-whitelist='pydantic' app
 
 tests: venv
-	./$(VENV)/bin/pytest -q app/tests/test_api.py
+	./$(VENV)/bin/pytest -q app/tests/test_api.py -q app/tests/test_utils.py
 
 coverage: venv
-	./$(VENV)/bin/coverage run -m pytest -q app/tests/test_api.py && ./$(VENV)/bin/coverage report -m
+	./$(VENV)/bin/coverage run -m pytest -q app/tests/test_api.py -q app/tests/test_utils.py && ./$(VENV)/bin/coverage report -m
 
 run: venv
 	./$(VENV)/bin/uvicorn app.main:app --host localhost --port 8000 --reload

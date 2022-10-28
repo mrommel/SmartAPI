@@ -1,14 +1,13 @@
 """captcha module"""
-import datetime
+import random
 import string
 import tempfile
-import random
 
+from captcha.image import ImageCaptcha
 from fastapi import Path, APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette import status
 from starlette.responses import FileResponse
-from captcha.image import ImageCaptcha
 
 from app import models
 from app.database import get_db

@@ -9,6 +9,7 @@ from starlette.testclient import TestClient
 
 from app.database import Base, get_db
 from app.main import app
+from app.routers.captcha import _set_captcha
 
 # Redefining name - for fixtures
 # pylint: disable=W0621
@@ -52,6 +53,11 @@ def create_test_user():
 		fixture to create a test user
 		:return: Nothing
 	"""
+	db = TestingSessionLocal()
+	# fake captcha
+	_set_captcha('token', 'code', db)
+
+	# make request
 	signup_response = client.post(
 		"/api/auth/signup",
 		json={
@@ -62,7 +68,9 @@ def create_test_user():
 			"passwordConfirm": "secret123",
 			"role": "User",
 			"gender": "Male",
-			"verified": "true"
+			"verified": "true",
+			"captchaCode": "code",
+			"captchaToken": "token"
 		},
 	)
 
@@ -136,7 +144,9 @@ def test_cant_create_user_twice(valid_access_token):
 			"passwordConfirm": "secret234",
 			"role": "User",
 			"gender": "Male",
-			"verified": "true"
+			"verified": "true",
+			"captchaCode": "code",
+			"captchaToken": "token"
 		},
 	)
 
@@ -149,13 +159,14 @@ def test_cant_create_user_twice(valid_access_token):
 	}
 
 
-def test_cant_create_user_password_mismatch(valid_access_token):
+def test_cant_create_user_password_mismatch():
 	"""
 		check if a user with different password cant be created
-
-		:param valid_access_token:
-		:return:
 	"""
+	db = TestingSessionLocal()
+	# fake captcha
+	_set_captcha('token', 'code', db)
+
 	signup_response = client.post(
 		"/api/auth/signup",
 		json={
@@ -166,7 +177,9 @@ def test_cant_create_user_password_mismatch(valid_access_token):
 			"passwordConfirm": "secret1234", # mismatch
 			"role": "User",
 			"gender": "Male",
-			"verified": "true"
+			"verified": "true",
+			"captchaCode": "code",
+			"captchaToken": "token"
 		},
 	)
 
@@ -176,6 +189,35 @@ def test_cant_create_user_password_mismatch(valid_access_token):
 		'code': 400,
 		'message': 'Passwords do not match',
 		'detail': 'Passwords do not match'
+	}
+
+
+def test_cant_create_user_captcha_empty():
+	"""
+		check if a user with different password cant be created
+	"""
+	signup_response = client.post(
+		"/api/auth/signup",
+		json={
+			"name": "string",
+			"email": "sample@abc.de",
+			"photo": "abc.jpg",
+			"password": "secret234",
+			"passwordConfirm": "secret234",
+			"role": "User",
+			"gender": "Male",
+			"verified": "true",
+			"captchaCode": "",
+			"captchaToken": "token"
+		},
+	)
+
+	# print(signup_response.json())
+	assert signup_response.status_code == 400
+	assert signup_response.json() == {
+		'code': 400,
+		'message': 'Captcha not valid',
+		'detail': 'Captcha not valid'
 	}
 
 
