@@ -8,3 +8,5 @@ test.sqlite
 app/tests/test.sqlite
 client_secret_264441737748-pccau743h1d0ve02d0lgccn5a8qoo91j.apps.googleusercontent.com.json
 token.json
+dist
+smartapi.egg-info

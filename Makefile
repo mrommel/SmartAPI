@@ -23,6 +23,10 @@ coverage: venv
 run: venv
 	./$(VENV)/bin/uvicorn app.main:app --host localhost --port 8000 --reload
 
+package: venv
+	./$(VENV)/bin/python -m pip install --upgrade build
+	./$(VENV)/bin/python -m build
+
 start-db: venv
 	docker-compose up -d
 
