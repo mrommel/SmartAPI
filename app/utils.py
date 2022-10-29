@@ -321,14 +321,17 @@ class CheckTaskState:
 			CheckContent(query='"how i met your mother"', min_duration=15),
 			CheckContent(query='tng', min_duration=40),
 			CheckContent(query='"next generation"', min_duration=40),
+			CheckContent(query='"star trek"', min_duration=40),
 			CheckContent(query='picard', min_duration=30),
 			CheckContent(query='hawkeye', min_duration=30),
 			CheckContent(query='wandavision', min_duration=30),
 			CheckContent(query='loki', min_duration=30),
 			CheckContent(query='"agent carter"', min_duration=30),
 			CheckContent(query='mandalorian', min_duration=30),
+			CheckContent(query='mandalorianer', min_duration=30),
 			CheckContent(query='obi-wan', min_duration=30),
 			CheckContent(query='"babylon berlin"', min_duration=30),
+			CheckContent(query='Voyager', min_duration=30),
 		]
 		self.current_index = len(self.checks)
 
