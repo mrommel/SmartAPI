@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}FastAPI powered Website{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+<h1>
+    2FA
+</h1>
+<form action="/videos" method="POST">
+  <div>
+    <label for="token">Please enter the code you were sent:</label>
+    <input type="text" name="token" id="token" />
+  </div>
+  <button type="submit">Check token</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% endblock %}

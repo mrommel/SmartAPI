@@ -2,20 +2,69 @@
 
 {% block title %}FastAPI powered Website{% endblock %}
 {% block head %}
-{{ super() }}
+    {{ super() }}
+    <!-- Custom error CSS -->
+    <link href="{{ url_for('static', path='/css/error.css') }}" rel="stylesheet">
 
+    <script type="text/javascript">
+      document.addEventListener('DOMContentLoaded', function() {
+        let cardToggles = document.getElementsByClassName('card-toggle');
+        for (let i = 0; i < cardToggles.length; i++) {
+          cardToggles[i].addEventListener('click', e => {
+            e.currentTarget.parentElement.parentElement.childNodes[3].classList.toggle('is-hidden');
+          });
+        }
+      });
+    </script>
 {% endblock %}
 
-{% block page_content %}
-    <h1>Error</h1>
-    <h2>{{error_title}}</h2>
-    <p>{{error_description}}</p>
-    <ul class="nav navbar-nav ml-auto">
-        <li class="nav-item active">
-            <a class="btn btn-info" href="/">Home</a>
-        </li>
-    </ul>
-    <p>&nbsp;</p>
+{% block content %}
+<section class="section">
+    <div class="box block error-box has-text-centered">
+        <div class="status-code">{{ data.status_code }}</div>
+        <div class="block">
+            <h1 class="subtitle is-1">{{ data.detail }}</h1>
+        </div>
+
+        <div id="more-info" class="block card is-fullwidth is-shadowless">
+            <header class="card-header is-shadowless">
+                <p class="card-header-title">More Info</p>
+                <a class="card-header-icon card-toggle">
+                    <i class="fa fa-angle-down"></i>
+                </a>
+            </header>
+
+            <div class="card-content has-text-left is-hidden">
+
+                <div class="content">
+                    Login Failed: Unable to find a valid CSRF token. Please try again.
+                </div>
+
+                <div class="content">
+                    Request ID: 1eabd655da911bac9def0b1fa17606db
+                </div>
+
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="columns">
+            <div class="column">
+                <form method="GET" action="/">
+                    <button type="submit" class="button is-danger is-fullwidth">Go back</button>
+                </form>
+            </div>
+            <div class="column">
+                <form method="GET" action="/oauth2/sign_in">
+                    <input type="hidden" name="rd" value="/">
+                    <button type="submit" class="button is-primary is-fullwidth">Sign in</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
 {% endblock %}
 
 {% block scripts %}

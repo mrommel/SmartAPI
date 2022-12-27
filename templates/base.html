@@ -34,12 +34,15 @@
 
 <body>
     <div class="page-container">
-        <!-- Page Content  -->
-        <div id="content">
-            {% include 'include/header.html' %}
-            {% block page_content %}
-            {% endblock %}
-        </div>
+        {% include 'include/header.html' %}
+
+        <section class="section section-content">
+            <!-- Page Content  -->
+            <div id="content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </section>
         <div class="footer-clean">
             {% include 'include/footer.html' %}
         </div>

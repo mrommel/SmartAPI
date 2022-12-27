@@ -2,11 +2,12 @@
 
 {% block title %}FastAPI powered Website{% endblock %}
 {% block head %}
-{{ super() }}
-
+    {{ super() }}
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', path='/css/checks.css') }}" rel="stylesheet">
 {% endblock %}
 
-{% block page_content %}
+{% block content %}
 <h1>
     Checks
 </h1>
@@ -67,15 +68,52 @@
         return hours + ':' + minutes + ':' + seconds;
     }
 
-    function download(video_id) {
-        console.log('start downloading ' + video_id);
+    function play(video_id, platform) {
+        console.log('start playing ' + video_id + ' on ' + platform);
+
+        if (platform == 'Youtube') {
+            var url = 'https://www.youtube.com/watch?v=' + video_id;
+            window.open(url, '_blank');
+        } else if (platform == 'Dailymotion') {
+            var url = 'https://www.dailymotion.com/video/' + video_id;
+            window.open(url, '_blank');
+        } else {
+            console.log('platform "' + platform + '" is not handled');
+        }
+    }
+
+    function download(video_id, platform) {
+        console.log('start downloading ' + video_id + ' on ' + platform);
+
+        var formData = {
+            'video_id': video_id,
+            'platform': platform
+        };
+
+        $.ajax({
+            type:"POST",
+            url: "/api/checks/download",
+            contentType: "application/json",
+            data: JSON.stringify(formData),
+            dataType: "json",
+            success: function(response) {
+                console.log('started downloaded video ' + video_id);
+
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1);
+            },
+            error: function(xhr, textStatus, exception) {
+                handleError(xhr, textStatus, exception);
+            }
+        });
     }
 
     function ignore(video_id) {
         console.log('start ignoring ' + video_id);
 
         var formData = {
-            video_id: video_id,
+            'video_id': video_id,
         };
 
         $.ajax({
@@ -166,9 +204,10 @@
                 var index = 0;
                 response.videos.forEach(video => {
                   // console.log('video: ' + video);
-                  var download_btn = '<button type="button" class="btn btn-danger" onclick="javascript:download(\'' + video.video_id + '\');"><i class="fa-solid fa-download"></i></button>';
+                  var play_btn = '<button type="button" class="btn btn-success" onclick="javascript:play(\'' + video.video_id + '\', \'' + video.platform + '\');"><i class="fa-solid fa-play"></i></button>';
+                  var download_btn = '<button type="button" class="btn btn-danger" onclick="javascript:download(\'' + video.video_id + '\', \'' + video.platform + '\');"><i class="fa-solid fa-download"></i></button>';
                   var ignore_btn = '<button type="button" class="btn btn-secondary" onclick="javascript:ignore(\'' + video.video_id + '\');"><i class="fa-solid fa-ban"></i></button>';
-                  $('#checksTable > tbody:last-child').append('<tr><td>' + index + '</td><td><img class="video_icon" src="/static/images/' + video.platform + '.png" />&nbsp;' + video.video_id + '</td><td>' + video.title + '</td><td>' + video.duration.toString().toHHMMSS() + '</td><td class="video_actions">' + download_btn + ' | ' + ignore_btn + '</td></tr>');
+                  $('#checksTable > tbody:last-child').append('<tr><td>' + index + '</td><td><img class="video_icon" src="/static/images/' + video.platform + '.png" />&nbsp;' + video.video_id + '</td><td>' + video.title + '</td><td>' + video.duration.toString().toHHMMSS() + '</td><td class="video_actions">' + play_btn + ' | ' + download_btn + ' | ' + ignore_btn + '</td></tr>');
                   index += 1;
                 });
             },

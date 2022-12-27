@@ -25,7 +25,7 @@ def upgrade() -> None:
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('duration', sa.Integer(), nullable=False),
         sa.Column('platform', sa.Enum('Dailymotion', 'VK', 'Youtube', name='platformchoices'), server_default='Dailymotion', nullable=True),
-        sa.Column('action', sa.Enum('Ignore', 'Download', 'Pending', name='actionchoices'), server_default='Pending', nullable=True),
+        sa.Column('action', sa.Enum('Ignore', 'Downloading', 'Downloaded', 'Pending', name='actionchoices'), server_default='Pending', nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint('id'),

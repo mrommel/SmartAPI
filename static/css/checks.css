@@ -1,0 +1,37 @@
+.actions {
+    margin-bottom: 16px;
+    height: 32px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#refresh_actions {
+
+}
+
+#refresh_button {
+    float: left;
+    margin-right: 16px;
+}
+
+#refresh_img {
+    float: left;
+    display: none;
+    padding-left: 8px;
+    width: 42px;
+}
+
+#refresh_status {
+    float: left;
+    display: none;
+    padding-left: 8px;
+    padding-top: 5px;
+}
+
+.video_actions {
+    width: 172px;
+}
+
+.video_icon {
+    width: 32px;
+}

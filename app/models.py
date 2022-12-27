@@ -120,6 +120,7 @@ class ActionChoices(enum.Enum):
 		enum that contains action choices
 	"""
 	IGNORE = 'Ignore'
+	DOWNLOADING = 'Downloading'
 	DOWNLOADED = 'Download'
 	PENDING = 'Pending'
 

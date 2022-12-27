@@ -12,9 +12,11 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
+from urllib3.exceptions import MaxRetryError
 
 from app import models
 from app.config import settings
+from app.models import PlatformChoices, ActionChoices
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -44,6 +46,7 @@ class CheckContent:
 	"""
 		class that encapsulates data to be checked on different platforms
 	"""
+
 	def __init__(self, query: str, min_duration: int):
 		self.query = query
 		self.min_duration = min_duration
@@ -146,6 +149,7 @@ class YoutubeVideoId:
 	"""
 		class representation of youtube video id
 	"""
+
 	def __init__(self, kind: str, videoId: str):
 		"""
 			constructs a youtube video id
@@ -185,6 +189,7 @@ class YoutubeContentDetails:
 	"""
 		class represents youtube video content details
 	"""
+
 	def __init__(self, duration: str):
 		"""
 			constructor of youtube content details
@@ -206,13 +211,14 @@ class YoutubeVideoItem:
 	"""
 		class that represents a youtube video
 	"""
+
 	def __init__(
 		self,
 		kind: str,
 		etag: str,
 		id: YoutubeVideoId,
 		snippet: YoutubeSnippet,
-	    contentDetails: YoutubeContentDetails = None
+		contentDetails: YoutubeContentDetails = None
 	):
 		"""
 			constructor of a youtube video
@@ -241,13 +247,14 @@ class YoutubeVideoList:
 	"""
 		class that represents a youtube video list
 	"""
+
 	def __init__(
 		self,
 		kind: str,
 		etag: str,
 		nextPageToken: str = '',
 		regionCode: str = '',
-	    pageInfo: YoutubePageInfo = None,
+		pageInfo: YoutubePageInfo = None,
 		items: [YoutubeVideoItem] = None
 	):
 		"""
@@ -326,12 +333,24 @@ class CheckTaskState:
 			CheckContent(query='hawkeye', min_duration=30),
 			CheckContent(query='wandavision', min_duration=30),
 			CheckContent(query='loki', min_duration=30),
-			CheckContent(query='"agent carter"', min_duration=30),
+			CheckContent(query='"agent carter"', min_duration=15),
 			CheckContent(query='mandalorian', min_duration=30),
+			CheckContent(query='"S.H.I.E.L.D."', min_duration=30),
 			CheckContent(query='mandalorianer', min_duration=30),
 			CheckContent(query='obi-wan', min_duration=30),
+			CheckContent(query='kenobi', min_duration=30),
 			CheckContent(query='"babylon berlin"', min_duration=30),
 			CheckContent(query='Voyager', min_duration=30),
+			CheckContent(query='"Agatha Christie" Poirot', min_duration=30),
+			# CheckContent(query='"Mord ist ihr Hobby"', min_duration=30),
+			CheckContent(query='wakanda', min_duration=30),
+			CheckContent(query='"police academy"', min_duration=30),
+			CheckContent(query='"Die Tudors"', min_duration=30),
+			CheckContent(query='"Neues aus Entenhausen"', min_duration=20),
+			CheckContent(query='"The Crown"', min_duration=45),
+			CheckContent(query='"Andor"', min_duration=35),
+			CheckContent(query='"New girl"', min_duration=20),
+			CheckContent(query='"broke girls"', min_duration=20),
 		]
 		self.current_index = len(self.checks)
 
@@ -342,7 +361,13 @@ class CheckTaskState:
 			:param url: video url to check
 			:param db: database
 		"""
-		response = requests.get(url.dailymotion_url(), timeout=10)
+		dailymotion_url = url.dailymotion_url()
+		try:
+			response = requests.get(dailymotion_url, timeout=10)
+		except (requests.exceptions.ConnectionError, MaxRetryError):
+			print(f'cannot fetch url from dailymotion: {dailymotion_url}')
+			return
+
 		video_list = DailymotionVideoList(**response.json())
 
 		for video in video_list.videos:
@@ -481,7 +506,7 @@ class CheckTaskState:
 		self.current_index = 0
 		for check in self.checks:
 			self._check_dailymotion_url(check, db)
-			self._check_youtube_url(check, db)
+			# self._check_youtube_url(check, db)
 			self.current_index += 1
 		print(f'checked all {len(self.checks)} items')
 
@@ -500,3 +525,46 @@ class CheckTaskState:
 
 
 check_state = CheckTaskState()
+
+
+class DownloadTaskState:
+	"""
+		class that represents the complete data of a download request
+	"""
+
+	def __init__(self):
+		pass
+
+	def download_background_work(self, video_id: str, platform: str, db: Session):
+		"""
+			starts the download of dailymotion or youtube video
+
+			:param video_id: id of video
+			:param platform: platform
+			:param db: database
+			:return: Nothing
+		"""
+		user_path = os.path.expanduser('~')
+		if platform == PlatformChoices.YOUTUBE.value:
+			print(f'started downloading of youtube video {video_id}')
+			os.system(f"cd '{user_path}/Downloads'; youtube-dl https://www.youtube.com/watch?v={video_id}")
+			print(f'finished downloading of youtube video {video_id}')
+		elif platform == PlatformChoices.DAILYMOTION.value:
+			print(f'started downloading of dailymotion video {video_id}')
+
+			os.system(f"cd '{user_path}/Downloads'; youtube-dl https://www.dailymotion.com/video/{video_id}")
+			print(f'finished downloading of dailymotion video {video_id}')
+		else:
+			print(f'could not download video from platform: {platform}')
+			return
+
+		existing_video = db.query(models.Video).filter(models.Video.video_id == video_id).first()
+		if existing_video is None:
+			raise Exception('can get downloaded video')
+
+		existing_video.action = ActionChoices.DOWNLOADED.value
+		db.add(existing_video)
+		db.commit()
+
+
+download_state = DownloadTaskState()

@@ -9,6 +9,10 @@ from pydantic import ValidationError
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, \
 	HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND, HTTP_504_GATEWAY_TIMEOUT
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.templating import Jinja2Templates
+
+templates = Jinja2Templates(directory="templates")
 
 HTTP_600_ID_NOT_EXISTED = 600
 
@@ -139,7 +143,30 @@ def init_exception(app: FastAPI):
 		# Print the detailed information of the exception to the console, and you can also write the log to the
 		# corresponding file system here, etc.
 		# print(format_exc(), flush=True)
+		print('base exception handler')
 		return ErrorResponse(exc.code, message=exc.message, detail=exc.detail)
+
+	@app.exception_handler(StarletteHTTPException)
+	async def starlette_exception_handler(request, exc: StarletteHTTPException) -> ErrorResponse:
+		"""
+			Catch real HTTP exceptions
+
+			:param request: the request
+			:param exc: generic exception
+			:return: ErrorResponse
+		"""
+		_ = request  # prevent warning
+		# Print the detailed information of the exception to the console, and you can also write the log to the
+		# corresponding file system here, etc.
+		# print(format_exc(), flush=True)
+		print(f'starlette exception handler - real http: {exc.status_code}')
+
+		data = {
+			"page": "Error",
+			"status_code": exc.status_code,
+			"detail": exc.detail
+		}
+		return templates.TemplateResponse('error.html', {"request": request, "data": data})
 
 	@app.exception_handler(HTTPException)
 	async def http_exception_handler(request, exc: HTTPException) -> ErrorResponse:
@@ -152,6 +179,7 @@ def init_exception(app: FastAPI):
 		"""
 		_ = request  # prevent warning
 		# print(format_exc(), flush=True)
+		print('http exception handler')
 		return ErrorResponse(exc.status_code, message=str(exc.detail), detail=exc.detail)
 
 	@app.exception_handler(AuthJWTException)
@@ -175,6 +203,7 @@ def init_exception(app: FastAPI):
 		_ = exc  # prevent warning
 		msg = format_exc()
 		# print(msg, flush=True)
+		print('all exception handler')
 		return ErrorResponse(HTTP_500_INTERNAL_SERVER_ERROR, message='inner exception', detail=get_detail(msg))
 
 	@app.exception_handler(KeyError)

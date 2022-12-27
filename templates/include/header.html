@@ -1,54 +1,56 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-
-        <div class="collapse navbar-collapse">
-            <a href="/">
-                <img src="{{ url_for('static', path='/images/favicon.svg') }}" class="website_logo" />
-                <span class="website_title">FastAPI powered Website</span>
-            </a>
-        </div>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="nav navbar-nav ml-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="/">Home</a>
-                    &nbsp;
+<nav class="navbar navbar-expand-lg navbar-dark" id="ac-globalnav">
+    <div class="ac-gn-content">
+        <ul class="ac-gn-list">
+            <li class="ac-gn-item ac-gn-icon">
+                <a class="ac-gn-link ac-gn-link-icon" href="/" id="ac-gn-firstfocus">
+                    <span class="ac-gn-link-text">Home</span>
+                </a>
+            </li>
+            <li class="ac-gn-item ac-gn-item-menu ac-gn-checks">
+                <a class="ac-gn-link ac-gn-link-checks" href="/checks">
+                    <span class="ac-gn-link-text">Checks</span>
+                </a>
+            </li>
+            {% if data is defined and data.logged == 'True' %}
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-profile">
+                    <a class="ac-gn-link ac-gn-link-profile" href="/profile">
+                        <span class="ac-gn-link-text">Profile</span>
+                    </a>
                 </li>
-                {% if data is defined and data.logged == 'True' %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/profile">Profile&nbsp;</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/checks">Checks&nbsp;</a>
-                    </li>
-                    <li class="nav-item">
-                        <!-- Button to open the modal login form -->
-                        <button type="button" class="btn btn-danger" onclick="javascript:logout();">
-                            <i class="fa-solid fa-right-to-bracket"></i>
-                            <span>Logout</span>
-                        </button>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <!-- Button to open the modal registration form -->
-                        <button type="button" class="btn btn-secondary" onclick="javascript:showSignupForm()">
-                            <i class="fa-solid fa-right-to-bracket"></i>
-                            <span>Sign Up</span>
-                        </button>
-                        &nbsp;
-                    </li>
-                    <li class="nav-item">
-                        <!-- Button to open the modal login form -->
-                        <button type="button" class="btn btn-info" onclick="javascript:showLoginForm()">
-                            <i class="fa-solid fa-right-to-bracket"></i>
-                            <span>Login</span>
-                        </button>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
+                <li class="ac-gn-item ac-gn-item-spacer">
+                    <span class="ac-gn-spacer">&nbsp;</span>
+                </li>
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-logout">
+                    <! -- Button to open the modal login form -- >
+                    <button type="button" class="button-danger" onclick="javascript:logout();">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>Logout</span>
+                    </button>
+                </li>
+            {% else %}
+                <li class="ac-gn-item ac-gn-item-spacer">
+                    <span class="ac-gn-spacer">&nbsp;</span>
+                </li>
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-signup">
+                    <! -- Button to open the modal registration form -- >
+                    <button type="button" class="button-secondary" onclick="javascript:showSignupForm()">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>Sign Up</span>
+                    </button>
+                </li>
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-login">
+                    <!- - Button to open the modal login form -- >
+                    <button type="button" class="button-info" onclick="javascript:showLoginForm()">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>Login</span>
+                    </button>
+                </li>
+            {% endif %}
+        </ul>
     </div>
 </nav>
+<div id="ac-gn-curtain" class="ac-gn-curtain"></div>
+<div id="ac-gn-placeholder" class="ac-nav-placeholder"></div>
 
 <!-- Modal Login Form (hidden) -->
 <div id="login_form" class="w3-modal" style="cursor:pointer; display: none;">
