@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
 from app.config import settings
-from app.debug import VKAPI, TwoFactorException
+# from app.debug import VKAPI, TwoFactorException
 from app.exceptions import init_exception
 from app.routers import user, auth, check, captcha
 from app.schemas import VersionResponse
