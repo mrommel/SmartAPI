@@ -341,6 +341,7 @@ class CheckTaskState:
 			CheckContent(query='kenobi', min_duration=30),
 			CheckContent(query='"babylon berlin"', min_duration=30),
 			CheckContent(query='Voyager', min_duration=30),
+			CheckContent(query='"Deep space nine"', min_duration=30),
 			CheckContent(query='"Agatha Christie" Poirot', min_duration=30),
 			# CheckContent(query='"Mord ist ihr Hobby"', min_duration=30),
 			CheckContent(query='wakanda', min_duration=30),
@@ -351,6 +352,11 @@ class CheckTaskState:
 			CheckContent(query='"Andor"', min_duration=35),
 			CheckContent(query='"New girl"', min_duration=20),
 			CheckContent(query='"broke girls"', min_duration=20),
+			CheckContent(query='Bridgerton', min_duration=45),
+			CheckContent(query='"Dark desire"', min_duration=25),
+			CheckContent(query='Foundation', min_duration=35),
+			CheckContent(query='"all mankind"', min_duration=25),
+			CheckContent(query='"sex life"', min_duration=45),
 		]
 		self.current_index = len(self.checks)
 
