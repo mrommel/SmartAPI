@@ -328,6 +328,7 @@ class CheckTaskState:
 			CheckContent(query='"how i met your mother"', min_duration=15),
 			CheckContent(query='tng', min_duration=40),
 			CheckContent(query='"next generation"', min_duration=40),
+			CheckContent(query='"nächste generation"', min_duration=40),
 			CheckContent(query='"star trek"', min_duration=40),
 			CheckContent(query='picard', min_duration=30),
 			CheckContent(query='hawkeye', min_duration=30),
@@ -357,6 +358,8 @@ class CheckTaskState:
 			CheckContent(query='Foundation', min_duration=35),
 			CheckContent(query='"all mankind"', min_duration=25),
 			CheckContent(query='"sex life"', min_duration=45),
+			CheckContent(query='Sanditon', min_duration=45),
+			CheckContent(query='"carnival row"', min_duration=25),
 		]
 		self.current_index = len(self.checks)
 
@@ -370,7 +373,7 @@ class CheckTaskState:
 		dailymotion_url = url.dailymotion_url()
 		try:
 			response = requests.get(dailymotion_url, timeout=10)
-		except (requests.exceptions.ConnectionError, MaxRetryError):
+		except (requests.exceptions.ConnectionError, MaxRetryError, requests.exceptions.ReadTimeout):
 			print(f'cannot fetch url from dailymotion: {dailymotion_url}')
 			return
 
