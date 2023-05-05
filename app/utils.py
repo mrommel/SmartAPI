@@ -360,6 +360,7 @@ class CheckTaskState:
 			CheckContent(query='"sex life"', min_duration=45),
 			CheckContent(query='Sanditon', min_duration=45),
 			CheckContent(query='"carnival row"', min_duration=25),
+			CheckContent(query='tudors', min_duration=50),
 		]
 		self.current_index = len(self.checks)
 
@@ -371,10 +372,14 @@ class CheckTaskState:
 			:param db: database
 		"""
 		dailymotion_url = url.dailymotion_url()
+		headers = {
+			'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+			# 'Cookie': 'v1st=F8113B59773797A0CBD6D0613649845A; usprivacy=1---; dmaid=5e1292c9-4a96-4e8a-a715-0aa5ff4bf15a; _ga=GA1.2.861277864.1664993729; __gads=ID=fc0c0eb80d5eb496:T=1666538397:S=ALNI_MYZevnl7LfU3RPZVqOkg5nI_WewoQ; ts=57292; _ga_Z9T46716Q4=GS1.1.1676820888.3.1.1676821350.0.0.0; dmvk=63fdec567b1d1; _cc_id=cf5c432a53557489d922d5677e7f53a0; sdx=nHbWXZwmvekhfhE8kSTzqLkQ-MLXO-xBxeYZSvgussWEkJ-_NVn4fnrzdZI0T5lP; dm-euconsent-v2=CPqQxoAPqQxoABpAGAENDACsAP_AAH_AAAqIJXNd_H__bW9r-f5_aft0eY1P9_r77uQzDhfNk-4F3L_W_LwX52E7NF36tq4KmR4ku3LBIUNlHNHUDVmwaokVryHsak2cpTNKJ6BEkHMZO2dYGF5vmxtj-QKY5_5_d3bx2D-t_dv-39z3z81Xn3d5_-_02PCdU5_9Dfn9fR_b-9KP9_78v8v8_9_rk2_e3_3_79_7_H9-f_BKsAkw1biALsyxwZtAwigRAjCsJCKBQAQUAwtEBAA4OCnZWAT6wiQAoBQBGBECHAFGRAIAABIAkIgAkCLBAAACIBAACABAIhAAwMAgoALAQCAAEA0DFEKAAQJCDIiIilMCAqBIICWyoQSgukNMIAqywAoBEbBQAIgkBFYAAgLBwDBEgJWLBAkxBtEAAwAoBRKhWopPTQELAAAA; _gid=GA1.2.2061851782.1681573711; cto_bundle=gZmJVV9WOWNNc1glMkZHSmZnaHlkSTcwRmMlMkJKUW5CVDdVVWpLZkViME1rWDVab25hMVh6bTdOaXNCNEM2VVQwbnFJMU1IMG13OWFHNEpwWEdsViUyQlBBZ0RmdTNkNWR0RndaaTd6R1ZyNlM4Q1M2c1RZaExuaGlIa3JjMG4lMkJrZTJweXlyMSUyQlRXdTF6Z0tKeFFSRiUyQk45bEx2dkw2MHpNJTJGN2ZrZlBYNTVEYWE2MkwzT1VXeCUyRktPSWp3UkJjWWJDZjE4bzJsRzFvdkFheFpMUHM4dFNyQVkwaDRvb1BsUSUzRCUzRA; __gpi=UID=00000b77e2dec82d:T=1666538397:RT=1681574012:S=ALNI_MbfjAThJKttWjqAKbxww5PCjKeJIg; damd=zymR9zK6tATURghPNZ8udlHzYvpnVWYiVAlak7oi22TGSWK4yXRW3knVbMepKJOh1Q7c4kYMAp-loWah3_UWY6v8H23158RG38oHCUDIkcmH43ka39VrF-JTRKsXpm1a3aaOgKYTYyB5Imkn2yrJjIvlup4u23tpH4iR5cqQ4drsl4Vb40TdZxlxyOLiPWxaqoorIZXaFmd_r73XNGHBfPc-aITpIbyj2ownYzNckvXtlFdyOzodpozU2cVb_juYy8YuODEeYvZVSx9B9JKVJknMURH2rTk0FeRP2lZ4EhGKOyx-yp5RqKVUt7-Fv6Kp_VqH9I2J5ndhP9bK7jL6ji66Hd7-sCMpz4JbG7f8hYJ06IG9Yg9bAF6ZcFkCcU1bPnsIDbxNtUektHhTo9_2xdcp9POCRhEMvyVgaBmm66d87XZJOysvTBmf1ovzjfwHKh5LOT2qW_bVlrOSQIApyAmOVT5ZrQPCzA5gEt4f_cudMbEWNV7_iVq-j0yRJAVWg1te9RFKKIt6V3DxFscAm2ILLwXqn0suxkGhUAFfhk8JBzVSvx2VmbwqDNKT-32kFy4Hy6NbonAks8OHUVhDJSpdbYs5ipzblgIKyg9s3CQtVka9xXDvZjZUsVy182HUfIZe_WYrp4wwk2uqtUaxTP1eMyAUrLAQxeXu8OVjmle1H4dW_4T5cWIOFOMBTSHtTY1MSH5eCJsWBhEHCzeel0k30rwItoDpE_RO9MVxNse_uEGhyUvfyjKgxXwKEEgSbcSI6soSQh9saNUx6v1zevARRWEF0kiMDLQRSm75--k; vc=1/true; ff=on',
+		}
 		try:
-			response = requests.get(dailymotion_url, timeout=10)
-		except (requests.exceptions.ConnectionError, MaxRetryError, requests.exceptions.ReadTimeout):
-			print(f'cannot fetch url from dailymotion: {dailymotion_url}')
+			response = requests.get(dailymotion_url, headers=headers, timeout=10)
+		except (requests.exceptions.ConnectionError, MaxRetryError, requests.exceptions.ReadTimeout) as e:
+			print(f'cannot fetch url from dailymotion: {dailymotion_url} => {e}')
 			return
 
 		video_list = DailymotionVideoList(**response.json())
